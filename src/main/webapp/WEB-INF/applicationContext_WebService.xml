@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+
+    <!-- Defining the AbstractRuntimeException 
+    <bean id="serviceExceptionMapper"
+        class="com.service.exception.ServiceExceptionMapper">
+        <constructor-arg name="outputMediaType">
+            <value>application/json</value>
+        </constructor-arg>
+    </bean>-->
+    <jaxrs:server id="rsService" address="/rest">
+        <jaxrs:features>
+          <bean class="org.apache.cxf.transport.common.gzip.GZIPFeature"/>
+        </jaxrs:features>   
+        <jaxrs:serviceBeans>
+            <ref bean="restFinanceService" />
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider">
+                <constructor-arg ref="serviceObjectMapper"/>
+            </bean>
+            <!-- <ref bean="serviceExceptionMapper" /> -->
+        </jaxrs:providers>
+        <jaxrs:extensionMappings>
+            <entry key="json" value="application/json" />
+        </jaxrs:extensionMappings>
+    </jaxrs:server>
+   
+    <!-- ObjectMapper with SerializationConfig that doesn't write null properties -->
+   
+    <bean id="serviceObjectMapper" class="org.codehaus.jackson.map.ObjectMapper">
+        <property name="serializationConfig" ref="nonNullInclusionServiceSerializationConfig" />
+    </bean>
+
+    <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetObject" ref="serviceObjectMapper" />
+        <property name="targetMethod" value="disable" />
+        <property name="arguments">
+            <list>
+                <value>FAIL_ON_UNKNOWN_PROPERTIES</value>
+            </list>
+        </property>
+    </bean>
+   
+    <!--Retrieve SerializationConfig from ObjectMapper -->
+   
+    <bean id="serviceSerializationConfig" class="org.codehaus.jackson.map.SerializationConfig"
+        factory-bean="serviceObjectMapper" factory-method="getSerializationConfig">
+        <property name="dateFormat" ref="dtoDateFormat"/>
+    </bean>
+
+    <bean id="dtoDateFormat" class="java.text.SimpleDateFormat">
+        <constructor-arg value="yyyy-MM-dd'T'HH:mm:ssZ"/>
+    </bean>
+
+    <!--Create SerializationConfig with NON NULL inclusion -->
+   
+    <bean id="nonNullInclusionServiceSerializationConfig" class="org.codehaus.jackson.map.SerializationConfig"
+        factory-bean="serviceSerializationConfig" factory-method="withSerializationInclusion">
+        <constructor-arg value="NON_NULL" />
+    </bean>
+
+
+	<bean id="restFinanceService" class="com.hbar.finance.webservice.RESTFinanceServiceImpl">
+		<property name="financeService" ref="financeService"/>
+	</bean>
+</beans>
+

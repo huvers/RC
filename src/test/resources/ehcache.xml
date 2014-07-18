@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd" updateCheck="false">
+
+    <diskStore path="java.io.tmpdir" />
+
+    <defaultCache 
+    	eternal="false" 
+    	maxElementsInMemory="1000"
+        overflowToDisk="false" 
+        diskPersistent="false" 
+        timeToIdleSeconds="120"
+        timeToLiveSeconds="600" 
+        memoryStoreEvictionPolicy="LRU" 
+        statistics="true" />
+
+    <cache 
+    	name="org.hibernate.cache.StandardQueryCache" 
+        maxElementsInMemory="300" 
+        eternal="false" 
+        timeToLiveSeconds="120" 
+        statistics="true" />
+        
+	<cache 
+    	name="org.hibernate.cache.UpdateTimestampsCache" 
+        maxElementsInMemory="300" 
+        eternal="false" 
+        timeToLiveSeconds="120" 
+        statistics="true" />
+        
+	<cache 
+    	name="com.hbar.finance.model.METHOD_CACHE" 
+        maxElementsInMemory="10" 
+        eternal="false" 
+        timeToLiveSeconds="120" 
+        statistics="true" />
+ </ehcache>

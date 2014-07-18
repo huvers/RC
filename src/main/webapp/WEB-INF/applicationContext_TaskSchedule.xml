@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns:tx="http://www.springframework.org/schema/tx"
+	   xsi:schemaLocation="
+	   http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	   http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+	   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
+
+
+	   
+	   <bean id="scheduledStocksDataRetrievalInvoker" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+			<property name="targetObject" ref="financeService"/>
+			<property name="targetMethod" value="executeStocksDataRetrieval"/>	   
+	   </bean>
+	   
+	   <bean id="scheduledStocksDataRetrievalTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+	   		<property name="jobDetail" ref="scheduledStocksDataRetrievalInvoker"/>
+	   		<!--
+	   		<property name="cronExpression" value="second minute hour day_of_month month day_of_week (optional_year)"/>
+	   		<property name="cronExpression" value="0 46 * ? * *"/>
+	   		
+	   		  -->
+	   		<property name="cronExpression" value="0 0 16 ? * MON-FRI"/>
+	   </bean>
+		<!-- 
+	   <bean id="scheduledOptionsDataRetrievalInvoker" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+			<property name="targetObject" ref="financeService"/>
+			<property name="targetMethod" value="executeOptionsDataRetrieval"/>	   
+	   </bean>-->
+	   <!--
+	   <bean id="scheduledOptionsDataRetrievalTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+	   		<property name="jobDetail" ref="scheduledOptionsDataRetrievalInvoker"/>
+	   		
+	   		<property name="cronExpression" value="second minute hour day_of_month month day_of_week (optional_year)"/>
+	   		  
+	   		<property name="cronExpression" value="0 0 16 ? * MON-FRI"/>
+	   </bean>-->
+
+	   
+	   
+	   <bean id="strategyScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+	   		<property name="triggers">
+	   			<list>
+	   				<ref bean="scheduledStocksDataRetrievalTrigger"/>
+	   			<!-- 	<ref bean="scheduledOptionsDataRetrievalTrigger"/> -->
+	   			</list>
+	   		</property>
+	   </bean>
+	   
+	   
+	   
+</beans>
+	   

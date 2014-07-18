@@ -1,0 +1,17 @@
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			xsi:schemaLocation="
+				http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+			version="2.0">
+	<persistence-unit name="financeUnit" transaction-type="RESOURCE_LOCAL">
+		<class>com.hbar.finance.model.Company</class>
+		<class>com.hbar.finance.model.CompanyAndStrategyAnalysis</class>
+		<class>com.hbar.finance.model.OptionQuote</class>
+		<class>com.hbar.finance.model.StockQuote</class>
+		<class>com.hbar.finance.model.Strategy</class>
+		<class>com.hbar.finance.model.BasicStockData</class>
+		<class>com.hbar.finance.model.EdsTickerTimeInfo</class>
+		<exclude-unlisted-classes>false</exclude-unlisted-classes>
+		<shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
+	</persistence-unit>
+</persistence>
