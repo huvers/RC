@@ -34,10 +34,36 @@
 			<property name="tradeKingClient" ref="tradeKingClient"/>
 		</bean>
 		
+		<bean id="CSI" class="com.hbar.finance.datasource.EquityDataSource"
+			factory-method="valueOf">
+			<constructor-arg>
+				<value>CSI</value>
+			</constructor-arg>
+		</bean>
+
+		<bean id="YAHOO" class="com.hbar.finance.datasource.EquityDataSource"
+			factory-method="valueOf">
+			<constructor-arg>
+				<value>YAHOO</value>
+			</constructor-arg>
+		</bean>
+		
+		<bean id="yahooBasicStockDataDownloader" class="com.hbar.finance.datasource.YahooBasicStockDataDownloader"></bean>
+		
+		<bean id="csiBasicStockDataDownloader" class="com.hbar.finance.datasource.CsiBasicStockDataDownloader">
+			<property name="fileLocation" value="${csi.fileLocation}"/>
+		</bean>
+		
 		<bean id="basicStockDataService" class="com.hbar.finance.service.BasicStockDataServiceImpl">
 			<property name="companyDao" ref="companyDao"/>
 			<property name="basicStockDataDao" ref="basicStockDataDao"/>
 			<property name="edsTickerTimeInfoService" ref="edsTickerTimeInfoService"/>
+			<property name="equityDataSourceToBasicStockDataDownloader">
+		        <map>
+		            <entry key-ref="YAHOO"><ref bean="yahooBasicStockDataDownloader"/></entry>
+		            <entry key-ref="CSI"><ref bean="csiBasicStockDataDownloader"/></entry>
+		        </map>   
+		    </property>
 		</bean>
 		
 		<bean id="edsTickerTimeInfoService" class="com.hbar.finance.service.EdsTickerTimeInfoServiceImpl">

@@ -15,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.hbar.finance.dao.BasicStockDataDao;
 import com.hbar.finance.dao.CompanyDao;
+import com.hbar.finance.datasource.BasicEquityDataDownloader;
+import com.hbar.finance.datasource.BasicStockDataDownloader;
 import com.hbar.finance.datasource.CsiBasicStockDataDownloader;
 import com.hbar.finance.datasource.EquityDataSource;
 import com.hbar.finance.datasource.YahooBasicStockDataDownloader;
@@ -30,6 +32,8 @@ public class BasicStockDataServiceImpl implements BasicStockDataService {
 	
 	private EdsTickerTimeInfoService edsTickerTimeInfoService;
 	
+	private Map<EquityDataSource, BasicEquityDataDownloader> equityDataSourceToBasicStockDataDownloader;
+	
 	public void setBasicStockDataDao(BasicStockDataDao basicStockDataDao){
 		this.basicStockDataDao=basicStockDataDao;
 	}
@@ -38,6 +42,9 @@ public class BasicStockDataServiceImpl implements BasicStockDataService {
 	}
 	public void setCompanyDao(CompanyDao companyDao){
 		this.companyDao=companyDao;
+	}
+	public void setEquityDataSourceToBasicStockDataDownloader(Map<EquityDataSource, BasicEquityDataDownloader> equityDataSourceToBasicStockDataDownloader){
+		this.equityDataSourceToBasicStockDataDownloader=equityDataSourceToBasicStockDataDownloader;
 	}
 	
 	
@@ -189,18 +196,12 @@ public class BasicStockDataServiceImpl implements BasicStockDataService {
 	public List<BasicStockData> getBasicEquityDataForCompanyFromDataSource(Company company, EquityDataSource equityDataSource) throws Exception{
 		
 		EdsTickerTimeInfo timeInfo=edsTickerTimeInfoService.getEdsTickerTimeInfo(company.getId(), equityDataSource);
-		if(equityDataSource.equals(EquityDataSource.CSI)){
-			
-			CsiBasicStockDataDownloader csiBasicStockDataDownloader=new CsiBasicStockDataDownloader();
-			return csiBasicStockDataDownloader.getBasicEquityDataForCompany(company, timeInfo!=null?timeInfo.getCloseTimeUtc():null);
-			
-		}else if(equityDataSource.equals(EquityDataSource.YAHOO)){
-			
-			YahooBasicStockDataDownloader yahooBasicStockDataDownloader=new YahooBasicStockDataDownloader();
-			return yahooBasicStockDataDownloader.getBasicEquityDataForCompany(company, timeInfo!=null?timeInfo.getCloseTimeUtc():null);
-			
+		BasicEquityDataDownloader basicEquityDataDownloader=equityDataSourceToBasicStockDataDownloader.get(equityDataSource);
+		if(basicEquityDataDownloader==null){
+			throw new Exception("NO SUCH DATA SOURCE");	
 		}
-		throw new Exception("NO SUCH DATA SOURCE");
+		
+		return basicEquityDataDownloader.getBasicEquityDataForCompany(company, timeInfo!=null?timeInfo.getCloseTimeUtc():null);
 	}
 	
 	@Transactional

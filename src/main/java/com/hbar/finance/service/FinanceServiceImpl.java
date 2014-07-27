@@ -118,7 +118,7 @@ public class FinanceServiceImpl implements FinanceService {
 	
 	@Transactional
 	public void executeStocksDataRetrieval(){
-		List<Company> companies=companyDao.findAll();
+		List<Company> companies=companyAndStrategyAnalysisDao.getCompaniesForStrategyId(StrategyEnum.BOLLINGER_CLASSIFIER.getStrategyId());
 		for(Company curCompany:companies){
 			retrieveAndPersistsStocksInfo(curCompany.getSymbol());
 		}

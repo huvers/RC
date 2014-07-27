@@ -2,7 +2,8 @@ package com.hbar.finance.strategy;
 
 public enum StrategyEnum {
 	
-	BOLLINGER_CLASSIFIER(1l);
+	BOLLINGER_CLASSIFIER(1l),
+	RESERVOIR(2l);
 	
 	Long strategyId;
 	

@@ -26,8 +26,15 @@ public class CsiBasicStockDataDownloader implements BasicEquityDataDownloader{
 	private static final int VOLUME_COLUMN_INDEX=6;
 	private final String DEFAULT_CLOSE_TIME="13:00:00 -0700";
 	
+	private String fileLocation;
+	
+	
+	public void setFileLocation(String fileLocation){
+		this.fileLocation=fileLocation;
+	}
+	
 	public List<BasicStockData> getBasicEquityDataForCompany(Company company, String closeTime) throws Exception {
-		File file=new File("C:\\ua\\Files\\CSI Stock Sample\\"+company.getSymbol()+".txt");
+		File file=new File(fileLocation+"/"+company.getSymbol()+".txt");
 		BufferedReader br = new BufferedReader(new FileReader(file));
 		String line;
 		

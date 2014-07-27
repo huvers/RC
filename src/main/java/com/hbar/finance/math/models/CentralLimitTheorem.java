@@ -63,7 +63,7 @@ public class CentralLimitTheorem {
 		for(Bucket bucket:buckets){
 			//System.out.println("bucket.start="+bucket.start+", bucket.end="+bucket.end+", bucket.count="+bucket.count);
 			System.out.print(bucket.start+"--");
-			for(int i=0;i<bucket.count/10;i++){
+			for(int i=0;i<bucket.count;i++){
 				System.out.print("X");
 			}
 			System.out.println();
@@ -141,8 +141,9 @@ public class CentralLimitTheorem {
 	
 	public static void main(String args[]){
 		CentralLimitTheorem centralLimitTheorem=new CentralLimitTheorem();
-		centralLimitTheorem.zDiceDistribution(100000);
-		//centralLimitTheorem.printTheDistributionToConsole(10000000, 2000, .05);
+		//centralLimitTheorem.zDiceDistribution(100000);
+		centralLimitTheorem.twoDiceDistribution(100);
+		//centralLimitTheorem.printTheDistributionToConsole(10000, 2000, .05);
 	}
 }
 class Bucket{

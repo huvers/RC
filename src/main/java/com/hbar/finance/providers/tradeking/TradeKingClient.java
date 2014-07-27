@@ -79,7 +79,8 @@ public class TradeKingClient
 
 			StocksResponse or1 = (StocksResponse) xStream.fromXML(strResponse);
 			return or1.getQuotes();
-		}catch(IllegalStateException exception){
+		}catch(Exception exception){
+			System.out.println("Error for OPTIONS_URL="+OPTIONS_URL);
 			exception.printStackTrace();
 		}
 		return new ArrayList<StockQuote>();
@@ -107,7 +108,8 @@ public class TradeKingClient
 			OptionsResponse or1 = (OptionsResponse) xStream
 					.fromXML(optionsResponse);
 			return or1.getQuotes();
-		}catch(IllegalStateException exception){
+		}catch(Exception exception){
+			System.out.println("Error for OPTIONS_URL="+OPTIONS_URL);
 			exception.printStackTrace();
 		}
 		return new ArrayList<OptionQuote>();
