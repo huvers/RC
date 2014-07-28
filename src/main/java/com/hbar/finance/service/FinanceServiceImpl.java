@@ -236,7 +236,7 @@ public class FinanceServiceImpl implements FinanceService {
 				TargetAndSignalDateHolder curTargetAndSignalDateHolder=associatedDataList.get(j).getTargetAndSignalDateHolder().get(i);
 				BasicStockData curTargetBasicStockData=(BasicStockData)curTargetAndSignalDateHolder.getTargetDateHolder();
 				//write line
-				if(associatedDataList.size()==1){
+				if(j==associatedDataList.size()-1){
 					writeBasicEquityDataToStringBuffer(sbDateAlignedEquityData, curTargetBasicStockData,true);
 				}else{
 					writeBasicEquityDataToStringBuffer(sbDateAlignedEquityData, curTargetBasicStockData, false);

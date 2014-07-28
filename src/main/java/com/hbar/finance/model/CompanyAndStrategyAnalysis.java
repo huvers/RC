@@ -17,7 +17,7 @@ import javax.persistence.Table;
 })
 @NamedQueries({
 	@NamedQuery( name="getCompaniesForStrategyId", query="SELECT c.theCompany FROM CompanyAndStrategyAnalysis c "+
-			"WHERE c.theStrategy.id=:strategyId")
+			"WHERE c.theStrategy.id=:strategyId AND c.active=1")
 })
 @Entity(name="CompanyAndStrategyAnalysis")
 @Table(name="company_strategy_analysis")
@@ -31,7 +31,7 @@ public class CompanyAndStrategyAnalysis extends IdentityModel{
 	@JoinColumn(name="strategy_id")	
 	private Strategy theStrategy;
 	
-	private Boolean enable=Boolean.TRUE;
+	private Boolean active=Boolean.TRUE;
 	
 	public Company getTheCompany() {
 		return theCompany;
@@ -39,11 +39,11 @@ public class CompanyAndStrategyAnalysis extends IdentityModel{
 	public void setTheCompany(Company theCompany) {
 		this.theCompany = theCompany;
 	}
-	public Boolean getEnable() {
-		return enable;
+	public Boolean getActive() {
+		return active;
 	}
-	public void setEnable(Boolean enable) {
-		this.enable = enable;
+	public void setEnable(Boolean active) {
+		this.active = active;
 	}
 	public Strategy getTheStrategy() {
 		return theStrategy;
