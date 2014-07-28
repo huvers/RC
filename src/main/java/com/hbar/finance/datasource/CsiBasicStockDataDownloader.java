@@ -34,7 +34,7 @@ public class CsiBasicStockDataDownloader implements BasicEquityDataDownloader{
 	}
 	
 	public List<BasicStockData> getBasicEquityDataForCompany(Company company, String closeTime) throws Exception {
-		File file=new File(fileLocation+"/"+company.getSymbol()+".txt");
+		File file=new File(fileLocation+"/"+company.getSymbol()+".csv");
 		BufferedReader br = new BufferedReader(new FileReader(file));
 		String line;
 		
