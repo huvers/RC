@@ -213,33 +213,15 @@ public class FinanceServiceImpl implements FinanceService {
 			
 			sbDateAlignedEquityData.append(DateUtils.createBasicStandardDateString(targetBasicStockData.getDateTime())+",");
 			writeBasicEquityDataToStringBuffer(sbDateAlignedEquityData, targetBasicStockData, false);
-			BasicStockData signalBasicStockData=null;
-			if( curFirstTargetAndSignalDateHolder.getSignalDateHolder() != null ){
-				signalBasicStockData=(BasicStockData)curFirstTargetAndSignalDateHolder.getSignalDateHolder();
-				//write line
-				if(associatedDataList.size()==1){
-					writeBasicEquityDataToStringBuffer(sbDateAlignedEquityData, signalBasicStockData,true);
-				}else{
-					writeBasicEquityDataToStringBuffer(sbDateAlignedEquityData, signalBasicStockData, false);
-				}
-			}else{
-				//write empty line
-				//write line
-				if(associatedDataList.size()==1){
-					writeBasicEquityDataToStringBuffer(sbDateAlignedEquityData, null,true);
-				}else{
-					writeBasicEquityDataToStringBuffer(sbDateAlignedEquityData, null, false);
-				}
-			}
 			
-			for(int j=1;j<associatedDataList.size();j++){
+			for(int j=0;j<associatedDataList.size();j++){
 				TargetAndSignalDateHolder curTargetAndSignalDateHolder=associatedDataList.get(j).getTargetAndSignalDateHolder().get(i);
-				BasicStockData curTargetBasicStockData=(BasicStockData)curTargetAndSignalDateHolder.getTargetDateHolder();
+				BasicStockData curSignalBasicStockData=(BasicStockData)curTargetAndSignalDateHolder.getSignalDateHolder();
 				//write line
 				if(j==associatedDataList.size()-1){
-					writeBasicEquityDataToStringBuffer(sbDateAlignedEquityData, curTargetBasicStockData,true);
+					writeBasicEquityDataToStringBuffer(sbDateAlignedEquityData, curSignalBasicStockData,true);
 				}else{
-					writeBasicEquityDataToStringBuffer(sbDateAlignedEquityData, curTargetBasicStockData, false);
+					writeBasicEquityDataToStringBuffer(sbDateAlignedEquityData, curSignalBasicStockData, false);
 				}
 			}
 		}
