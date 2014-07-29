@@ -161,13 +161,27 @@ public class FinanceServiceImpl implements FinanceService {
 	}
 
 	@Transactional
-	public String executeBasicEquityDataAlignment(String targetSymbol, List<String> symbols, DateTime startDate, DateTime endDate, String equityDataSource) throws Exception{
+	public String executeBasicEquityDataAlignment(String targetSymbol, List<String> symbols, DateTime startDate, DateTime endDate, String equityDataSource, boolean percentagesFormat) throws Exception{
 		Company company=companyDao.findBySymbol(targetSymbol);
-		List<BasicStockData> bsdList=basicStockDataService.getPercentageBasicStockDataForCompanyBetweenDates(company.getId(), startDate, endDate, false, equityDataSource);
+		
+		List<BasicStockData> bsdList=null;
+		if(percentagesFormat){
+			bsdList=basicStockDataService.getPercentageBasicStockDataForCompanyBetweenDates(company.getId(), startDate, endDate, false, equityDataSource);	
+		}else{
+			bsdList=basicStockDataService.getBasicStockDataForCompanyBetweenDates(company.getId(), startDate, endDate, false, equityDataSource);
+		}
+		
+		
 		List<AssociatedTargetAndSignalCompanyDateData> associatedDataList=new ArrayList<AssociatedTargetAndSignalCompanyDateData>();
 		for(String symbol:symbols){
 			Company signalCompany=companyDao.findBySymbol(symbol);
-			List<BasicStockData> signalBsdList=basicStockDataService.getPercentageBasicStockDataForCompanyBetweenDates(signalCompany.getId(), startDate, endDate, false, equityDataSource);	
+			List<BasicStockData> signalBsdList=null;
+			if(percentagesFormat){
+				signalBsdList=basicStockDataService.getPercentageBasicStockDataForCompanyBetweenDates(signalCompany.getId(), startDate, endDate, false, equityDataSource);
+			}else{
+				signalBsdList=basicStockDataService.getBasicStockDataForCompanyBetweenDates(signalCompany.getId(), startDate, endDate, false, equityDataSource);
+			}
+				
 			List<TargetAndSignalDateHolder> targetAndSignalDateHolderList=TargetAndSignalDateMatcher.matchDates(bsdList, signalBsdList);
 			
 			AssociatedTargetAndSignalCompanyDateData assocTargetAndSignalCompanyDateData=new AssociatedTargetAndSignalCompanyDateData();

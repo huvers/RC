@@ -30,6 +30,7 @@ public class RESTFinanceServiceImpl implements RESTFinanceService {
 	private static final String END_DATE = "endDate";
 	private static final String DATE = "date";
 	private static final String STRATEGY_ID = "strategyId";
+	private static final String PERCENTAGES_FORMAT = "percentagesFormat";
 
 	private FinanceService financeService;
 
@@ -46,10 +47,12 @@ public class RESTFinanceServiceImpl implements RESTFinanceService {
 			@QueryParam(TARGET_TICKER_ID) String targetTickerId,
 			@QueryParam(START_DATE) String startDate,
 			@QueryParam(END_DATE) String endDate,
-			@QueryParam(EQUITY_DATA_SOURCE_ID) String equityDataSourceId) throws Exception{
+			@QueryParam(EQUITY_DATA_SOURCE_ID) String equityDataSourceId,
+			@QueryParam(PERCENTAGES_FORMAT) Boolean percentagesFormat
+			) throws Exception{
 		DateTime startDateTime=DateUtils.createDateTimeFromString(startDate);
 		DateTime endDateTime=DateUtils.createDateTimeFromString(endDate);
-		String result=financeService.executeBasicEquityDataAlignment(targetTickerId, parseCommaDelimitedSymbols( signalTickerIds ), startDateTime, endDateTime, equityDataSourceId);
+		String result=financeService.executeBasicEquityDataAlignment(targetTickerId, parseCommaDelimitedSymbols( signalTickerIds ), startDateTime, endDateTime, equityDataSourceId, percentagesFormat==null?false:percentagesFormat);
 		return Response.ok().header("Content-Disposition", "attachment; filename=\"test_text_file.csv\"").entity(result).build();
 	}
 	
