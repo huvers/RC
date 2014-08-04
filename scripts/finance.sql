@@ -74,7 +74,7 @@ CREATE TABLE `company_strategy_analysis` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `company_id` int(11) DEFAULT NULL,
   `strategy_id` int(11) DEFAULT NULL,
-  `enable` tinyint(1) DEFAULT NULL,
+  `active` tinyint(1) DEFAULT NULL,
   `persistence_version` int(11) DEFAULT NULL,
   `created` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `last_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

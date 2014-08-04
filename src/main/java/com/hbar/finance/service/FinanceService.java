@@ -32,7 +32,7 @@ public interface FinanceService {
 
 	public void executeBasicEquityRetrievalForCompanyFromDataSource( Company company, String equityDataSource )  throws Exception;
 	
-	public String executeBasicEquityDataAlignment(String targetSymbol, List<String> symbols, DateTime startDate, DateTime endDate, String equityDataSource, boolean percentagesFormat) throws Exception;
+	public String executeBasicEquityDataAlignment(String targetSymbol, List<String> symbols, DateTime startDate, DateTime endDate, String equityDataSource, boolean isPercentagesFormat, boolean isAscending) throws Exception;
 	
 	public void executeBasicEquityDataRetrievalForStrategyFromDataSource(String strategy, String equityDataSource) throws Exception;
 

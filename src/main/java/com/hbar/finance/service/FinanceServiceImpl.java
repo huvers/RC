@@ -161,7 +161,7 @@ public class FinanceServiceImpl implements FinanceService {
 	}
 
 	@Transactional
-	public String executeBasicEquityDataAlignment(String targetSymbol, List<String> symbols, DateTime startDate, DateTime endDate, String equityDataSource, boolean percentagesFormat) throws Exception{
+	public String executeBasicEquityDataAlignment(String targetSymbol, List<String> symbols, DateTime startDate, DateTime endDate, String equityDataSource, boolean percentagesFormat, boolean isAscending) throws Exception{
 		Company company=companyDao.findBySymbol(targetSymbol);
 		
 		List<BasicStockData> bsdList=null;
@@ -191,26 +191,27 @@ public class FinanceServiceImpl implements FinanceService {
 			
 			associatedDataList.add(assocTargetAndSignalCompanyDateData);
 		}
-		return createDateAlignedEquityDataString(associatedDataList).toString();	
+		return createDateAlignedEquityDataString(associatedDataList, isAscending).toString();	
 	}
 	
-	private StringBuffer createDateAlignedEquityDataString(List<AssociatedTargetAndSignalCompanyDateData> associatedDataList){
+	private StringBuffer createDateAlignedEquityDataString(List<AssociatedTargetAndSignalCompanyDateData> associatedDataList, boolean isAscending){
 		StringBuffer sbDateAlignedEquityData=new StringBuffer();
 		boolean isFirstIteration=true;
 		for(int i=0;i<associatedDataList.size();i++){
 			AssociatedTargetAndSignalCompanyDateData curAssocData=associatedDataList.get(i);
 			if(isFirstIteration){
 				sbDateAlignedEquityData.append("Date,");
-				sbDateAlignedEquityData.append(curAssocData.getTargetCompany().getSymbol()+" Open,");
 				sbDateAlignedEquityData.append(curAssocData.getTargetCompany().getSymbol()+" Close,");
+				sbDateAlignedEquityData.append(curAssocData.getTargetCompany().getSymbol()+" Open,");
+				
 				sbDateAlignedEquityData.append(curAssocData.getTargetCompany().getSymbol()+" High,");
 				sbDateAlignedEquityData.append(curAssocData.getTargetCompany().getSymbol()+" Low,");
 				sbDateAlignedEquityData.append(curAssocData.getTargetCompany().getSymbol()+" Volume,");
 				
 				isFirstIteration=false;
 			}
-			sbDateAlignedEquityData.append(curAssocData.getSignalCompany().getSymbol()+" Open,");
 			sbDateAlignedEquityData.append(curAssocData.getSignalCompany().getSymbol()+" Close,");
+			sbDateAlignedEquityData.append(curAssocData.getSignalCompany().getSymbol()+" Open,");
 			sbDateAlignedEquityData.append(curAssocData.getSignalCompany().getSymbol()+" High,");
 			sbDateAlignedEquityData.append(curAssocData.getSignalCompany().getSymbol()+" Low,");
 			
@@ -222,7 +223,7 @@ public class FinanceServiceImpl implements FinanceService {
 		List<TargetAndSignalDateHolder> firstTargetAndSignalDateHolderList=firstAssocData.getTargetAndSignalDateHolder();
 		
 		for(int i=0;i<firstTargetAndSignalDateHolderList.size();i++){
-			TargetAndSignalDateHolder curFirstTargetAndSignalDateHolder=firstTargetAndSignalDateHolderList.get(i);
+			TargetAndSignalDateHolder curFirstTargetAndSignalDateHolder=firstTargetAndSignalDateHolderList.get(isAscending ? firstTargetAndSignalDateHolderList.size()-1-i :i);
 			BasicStockData targetBasicStockData=(BasicStockData)curFirstTargetAndSignalDateHolder.getTargetDateHolder();
 			
 			sbDateAlignedEquityData.append(DateUtils.createBasicStandardDateString(targetBasicStockData.getDateTime())+",");
@@ -246,8 +247,9 @@ public class FinanceServiceImpl implements FinanceService {
 	private void writeBasicEquityDataToStringBuffer(StringBuffer sb, BasicStockData bsd, boolean isLastBsd){
 		if(bsd!=null){
 
-			sb.append(bsd.getOpen()+",");
+			
 			sb.append(bsd.getClose()+",");
+			sb.append(bsd.getOpen()+",");
 			sb.append(bsd.getHigh()+",");
 			sb.append(bsd.getLow()+",");
 			sb.append(bsd.getVolume()+((isLastBsd)?"\n":","));

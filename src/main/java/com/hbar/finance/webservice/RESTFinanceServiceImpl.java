@@ -30,7 +30,12 @@ public class RESTFinanceServiceImpl implements RESTFinanceService {
 	private static final String END_DATE = "endDate";
 	private static final String DATE = "date";
 	private static final String STRATEGY_ID = "strategyId";
-	private static final String PERCENTAGES_FORMAT = "percentagesFormat";
+	private static final String IS_PERCENTAGES_FORMAT = "isPercentagesFormat";
+	private static final String IS_ASCENDING = "isAscending";
+	
+	private static final boolean DEFAULT_IS_PERCENTAGES_FORMAT=false;
+	
+	private static final boolean DEFAULT_IS_ASCENDING=true;
 
 	private FinanceService financeService;
 
@@ -48,11 +53,17 @@ public class RESTFinanceServiceImpl implements RESTFinanceService {
 			@QueryParam(START_DATE) String startDate,
 			@QueryParam(END_DATE) String endDate,
 			@QueryParam(EQUITY_DATA_SOURCE_ID) String equityDataSourceId,
-			@QueryParam(PERCENTAGES_FORMAT) Boolean percentagesFormat
+			@QueryParam(IS_PERCENTAGES_FORMAT) Boolean isPercentagesFormat,
+			@QueryParam(IS_ASCENDING) Boolean isAscending
 			) throws Exception{
 		DateTime startDateTime=DateUtils.createDateTimeFromString(startDate);
 		DateTime endDateTime=DateUtils.createDateTimeFromString(endDate);
-		String result=financeService.executeBasicEquityDataAlignment(targetTickerId, parseCommaDelimitedSymbols( signalTickerIds ), startDateTime, endDateTime, equityDataSourceId, percentagesFormat==null?false:percentagesFormat);
+		String result = financeService.executeBasicEquityDataAlignment(
+				targetTickerId, parseCommaDelimitedSymbols(signalTickerIds),
+				startDateTime, endDateTime, equityDataSourceId,
+				isPercentagesFormat == null ? DEFAULT_IS_PERCENTAGES_FORMAT
+						: isPercentagesFormat,
+				isAscending == null ? DEFAULT_IS_ASCENDING : isAscending);
 		return Response.ok().header("Content-Disposition", "attachment; filename=\"test_text_file.csv\"").entity(result).build();
 	}
 	
