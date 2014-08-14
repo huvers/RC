@@ -1,4 +1,8 @@
-package com.hbar.finance.math.models;
+package com.hbar.finance.quant.computation;
+
+import com.hbar.finance.math.models.Gaussian;
+import com.hbar.finance.math.models.StdRandom;
+
 /*************************************************************************
  *  Compilation:  javac BlackScholes.java MyMath.java
  *  Execution:    java BlackScholes S X r sigma T

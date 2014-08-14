@@ -1,17 +1,26 @@
-package com.hbar.finance.strategy;
+package com.hbar.finance.quant.computation;
+
+import com.hbar.finance.service.BasicStockDataService;
+
 /**
- * This class is used to test ideas outlined in "The Kelly Criterion In Blackjack Sports Betting, and The
+ * This class is used to compute calculations for ideas outlined in "The Kelly Criterion In Blackjack Sports Betting, and The
  * Stock Market" by Edward Thorp (2007), section 7.1.
  * 
- * @author Admin
+ * @author Gerardo.Alvarado
  *
  */
-public class ContinousApproximation {
+public class LogNormalDiffusionThorpProcess {
 	private double initialCapital;
 	
 	private double currentCapital;
 	
-	public ContinousApproximation(double initialCapital){
+	private BasicStockDataService basicStockDataService;
+	
+	public void setBasicStockDataService(BasicStockDataService basicStockDataService){
+		this.basicStockDataService=basicStockDataService;
+	}
+	
+	public LogNormalDiffusionThorpProcess(double initialCapital){
 		this.initialCapital=initialCapital;
 		this.currentCapital=initialCapital;
 		
@@ -33,7 +42,7 @@ public class ContinousApproximation {
 		
 		for (int j = 0; j < 10; j++) {
 			double currentCapital = 0;
-			ContinousApproximation continousApproximation=new ContinousApproximation(10000d);
+			LogNormalDiffusionThorpProcess continousApproximation=new LogNormalDiffusionThorpProcess(10000d);
 			for (int i = 0; i < nYears; i++) {
 				currentCapital = continousApproximation
 						.getNextYearCapitalAmount(kellyFraction, riskFreeRate,
@@ -52,7 +61,7 @@ public class ContinousApproximation {
 		
 		for (int j = 0; j < 10; j++) {
 			double currentCapital = 0;
-			ContinousApproximation continousApproximation=new ContinousApproximation(10000d);
+			LogNormalDiffusionThorpProcess continousApproximation=new LogNormalDiffusionThorpProcess(10000d);
 			for (int i = 0; i < nYears; i++) {
 				currentCapital = continousApproximation
 						.getNextYearCapitalAmount(kellyFraction, riskFreeRate,
@@ -72,7 +81,7 @@ public class ContinousApproximation {
 		
 		for (int j = 0; j < 10; j++) {
 			double currentCapital = 0;
-			ContinousApproximation continousApproximation=new ContinousApproximation(10000d);
+			LogNormalDiffusionThorpProcess continousApproximation=new LogNormalDiffusionThorpProcess(10000d);
 			for (int i = 0; i < nYears; i++) {
 				currentCapital = continousApproximation
 						.getNextYearCapitalAmount(kellyFraction, riskFreeRate,
@@ -91,7 +100,7 @@ public class ContinousApproximation {
 		
 		for (int j = 0; j < 10; j++) {
 			double currentCapital = 0;
-			ContinousApproximation continousApproximation=new ContinousApproximation(10000d);
+			LogNormalDiffusionThorpProcess continousApproximation=new LogNormalDiffusionThorpProcess(10000d);
 			for (int i = 0; i < nYears; i++) {
 				currentCapital = continousApproximation
 						.getNextYearCapitalAmount(kellyFraction, riskFreeRate,

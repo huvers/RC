@@ -24,7 +24,7 @@ import com.hbar.finance.service.BasicStockDataService;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations={"classpath:/applicationContext.xml"})
 @Transactional
-
+@Ignore
 public class BasicStockDataDownload {
 	@Autowired
 	public BasicStockDataDownloader basicStockDataDownloader;

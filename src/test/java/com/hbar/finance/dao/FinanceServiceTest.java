@@ -32,6 +32,7 @@ import com.hbar.finance.service.FinanceService;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations={"classpath:/applicationContext.xml"})
 @Transactional
+@Ignore
 public class FinanceServiceTest {
 	@Autowired
 	OptionQuoteDao optionQuoteDao;

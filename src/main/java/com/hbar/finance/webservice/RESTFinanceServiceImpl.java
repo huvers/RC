@@ -18,6 +18,8 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import com.hbar.finance.date.DateUtils;
+import com.hbar.finance.model.json.ValuePair;
+import com.hbar.finance.model.json.ValuePairs;
 import com.hbar.finance.service.FinanceService;
 
 @WebService(endpointInterface = "com.hbar.finance.webservice.RESTFinanceService")
@@ -26,12 +28,16 @@ public class RESTFinanceServiceImpl implements RESTFinanceService {
 	private static final String EQUITY_DATA_SOURCE_ID = "equityDataSourceId";
 	private static final String SIGNAL_TICKER_IDS = "signalTickerIds";
 	private static final String TARGET_TICKER_ID = "targetTickerId";
+	private static final String TICKER_ID = "tickerId";
 	private static final String START_DATE = "startDate";
 	private static final String END_DATE = "endDate";
 	private static final String DATE = "date";
 	private static final String STRATEGY_ID = "strategyId";
 	private static final String IS_PERCENTAGES_FORMAT = "isPercentagesFormat";
 	private static final String IS_ASCENDING = "isAscending";
+	private static final String TRAIN_DAYS = "trainDays";
+	private static final String TRIAL_DAYS = "trialDays";
+	
 	
 	private static final boolean DEFAULT_IS_PERCENTAGES_FORMAT=false;
 	
@@ -92,7 +98,34 @@ public class RESTFinanceServiceImpl implements RESTFinanceService {
 		return Response.ok().header("Content-Disposition", "attachment; filename=\"test_text_file.csv\"").entity(bollingerClassifier).build();
 	}
 	
-
+	@GET
+	@Path("/logNormalDiffusionThorpProcess")
+	/*@Consumes(MediaType.APPLICATION_JSON)*/
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response logNormalDiffusionThorpProcess(
+			@QueryParam(EQUITY_DATA_SOURCE_ID) String equityDataSourceId,
+			@QueryParam(TICKER_ID) String tickerId,
+			@QueryParam(START_DATE) DateTime startDate,
+			@QueryParam(TRAIN_DAYS) Integer trainDays,
+			@QueryParam(TRIAL_DAYS) Integer trialDays
+			
+			) throws Exception {
+		
+		ValuePairs valuePairsMock=new ValuePairs();
+		valuePairsMock.setMaxXValue(1);
+		valuePairsMock.setMinXValue(0);
+		
+		valuePairsMock.setMaxYValue(1);
+		valuePairsMock.setMinYValue(0);
+		
+		valuePairsMock.setValuePairs(new ArrayList<ValuePair>());
+		valuePairsMock.getValuePairs().add(new ValuePair(.5,.5));
+		valuePairsMock.getValuePairs().add(new ValuePair(.2,.6));
+		
+		return Response.ok().entity(valuePairsMock).build();
+		
+	}
+	
 	private List<String> parseCommaDelimitedSymbols(String commaDelimitedSymbols){
 		String[] splitSymbols=commaDelimitedSymbols.split(",");
 		List<String> symbols=new ArrayList<String>();
