@@ -7,7 +7,7 @@ public class ReservoirProperties {
 	}
 
 	public static class Using {
-		public boolean backPropigation = false;
+		public boolean backPropagation = false;
 		public boolean inputStates = true;
 		public boolean previousState = true;
 	}

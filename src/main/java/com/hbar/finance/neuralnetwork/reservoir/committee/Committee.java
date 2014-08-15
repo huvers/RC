@@ -10,7 +10,6 @@ import com.hbar.finance.neuralnetwork.reservoir.tools.Debugger;
 import com.hbar.finance.neuralnetwork.reservoir.tools.ThreadControl;
 import com.hbar.finance.neuralnetwork.reservoir.tools.Tools;
 
-
 /**
  * A set of Reservoirs all with the same properties working towards the same
  * task for better accuracy. Contains a multithreading component.
@@ -157,7 +156,7 @@ public class Committee {
 	/**
 	 * Executes an input on the Committee's Reservoirs in multiple threads
 	 * 
-	 * @param inputs
+	 * @param input
 	 *            - Inputs to execute on the Reservoirs
 	 */
 	public double[] exeMT(double[] input) {

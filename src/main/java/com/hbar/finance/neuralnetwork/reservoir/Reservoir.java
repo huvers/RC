@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.hbar.finance.neuralnetwork.reservoir.tools.Debugger;
 import com.hbar.finance.neuralnetwork.reservoir.tools.Tools;
-
 import Jama.Matrix;
 
 public class Reservoir {
@@ -172,7 +171,7 @@ public class Reservoir {
 			substate.plusEquals(wresTerm);
 		}
 
-		if (rp.using.backPropigation && data.outputs.size() > 0) {
+		if (rp.using.backPropagation && data.outputs.size() > 0) {
 			Matrix wbackTerm = wback.times(Tools.toColMatrix(data.getLastOutput()));
 			substate.plusEquals(wbackTerm);
 		}
