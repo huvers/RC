@@ -17,7 +17,7 @@ import javax.persistence.Table;
 })
 @NamedQueries({
 	@NamedQuery( name="getCompaniesForStrategyId", query="SELECT c.theCompany FROM CompanyAndStrategyAnalysis c "+
-			"WHERE c.theStrategy.id=:strategyId AND c.active=1")
+			"WHERE c.theStrategy.id=:strategyId AND c.active=true")
 })
 @Entity(name="CompanyAndStrategyAnalysis")
 @Table(name="company_strategy_analysis")

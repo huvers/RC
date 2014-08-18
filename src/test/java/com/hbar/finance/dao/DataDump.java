@@ -32,7 +32,7 @@ import com.hbar.finance.dao.OptionQuoteDao;
 import com.hbar.finance.dao.StockQuoteDao;
 import com.hbar.finance.model.OptionQuote;
 import com.hbar.finance.model.StockQuote;
-import com.hbar.finance.neural.Plot;
+//import com.hbar.finance.neural.Plot;
 import com.hbar.finance.service.FinanceService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -179,7 +179,7 @@ public class DataDump {
 				double[] minMaxY=monthToMinMaxYCoord.get(curMonth);
 				System.out.println("Month "+curMonth+", MinX="+minMaxX[0]+", MaxX="+minMaxX[1]+", MinY="+minMaxY[0]+", MaxY="+minMaxY[1]);
 			}
-			Plot.displayChart("S/E vs W/E", "S/E vs W/E", "xAxis", "yAxis", .7, 2, -.5, 1, months[0], monthToXYCoords.get(months[0]), months[1],  monthToXYCoords.get(months[1]));
+			//Plot.displayChart("S/E vs W/E", "S/E vs W/E", "xAxis", "yAxis", .7, 2, -.5, 1, months[0], monthToXYCoords.get(months[0]), months[1],  monthToXYCoords.get(months[1]));
 						
 /*			List<double[]> expectedSeries = new ArrayList<double[]>();
 			expectedSeries.add(new double[]{1.0, 0.679});

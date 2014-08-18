@@ -17,8 +17,7 @@ import com.hbar.finance.date.DateTimeHolder;
 import com.hbar.finance.date.TargetAndSignalDateHolder;
 import com.hbar.finance.date.TargetAndSignalDateMatcher;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations={"classpath:/testApplicationContext.xml"})
+
 public class TargetDateMatcherTest {
 	
 	public List<DateTimeHolder> createTargetDates(List<String> targetDates){

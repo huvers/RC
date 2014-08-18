@@ -48,10 +48,6 @@ public class FinanceServiceImpl implements FinanceService {
 		this.optionQuoteDao = optionQuoteDao;
 	}
 
-	public void setOptionQuoteDao(BasicStockDataService basicStockDataService) {
-		this.basicStockDataService=basicStockDataService;
-	}
-
 	public void setStockQuoteDao(StockQuoteDao stockQuoteDao) {
 		this.stockQuoteDao = stockQuoteDao;
 	}
