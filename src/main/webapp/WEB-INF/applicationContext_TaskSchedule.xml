@@ -15,6 +15,12 @@
 			<property name="targetMethod" value="executeStocksDataRetrieval"/>	   
 	   </bean>
 	   
+	   
+	   <bean id="scheduledStocksStreamingDataRetrievalInvoker" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+			<property name="targetObject" ref="financeService"/>
+			<property name="targetMethod" value="executeStocksStreamingDataRetrieval"/>	   
+	   </bean>
+	   
 	   <bean id="scheduledStocksDataRetrievalTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
 	   		<property name="jobDetail" ref="scheduledStocksDataRetrievalInvoker"/>
 	   		<!--
@@ -24,7 +30,20 @@
 	   		  -->
 	   		<property name="cronExpression" value="0 0 16 ? * MON-FRI"/>
 	   </bean>
-		<!-- 
+	   
+	   <bean id="scheduledStocksStreamingDataRetrievalTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+	   		<property name="jobDetail" ref="scheduledStocksStreamingDataRetrievalInvoker"/>
+	   		<!--
+	   		<property name="cronExpression" value="second minute hour day_of_month month day_of_week (optional_year)"/>
+	   		<property name="cronExpression" value="0 46 * ? * *"/>
+	   		
+	   		  -->
+	   		<property name="cronExpression" value="0 0 7 ? * MON-FRI"/>
+	   </bean>
+	   
+	   
+		<!--
+		 
 	   <bean id="scheduledOptionsDataRetrievalInvoker" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
 			<property name="targetObject" ref="financeService"/>
 			<property name="targetMethod" value="executeOptionsDataRetrieval"/>	   
@@ -44,6 +63,7 @@
 	   		<property name="triggers">
 	   			<list>
 	   				<ref bean="scheduledStocksDataRetrievalTrigger"/>
+	   				<ref bean="scheduledStocksStreamingDataRetrievalTrigger"/>
 	   			<!-- 	<ref bean="scheduledOptionsDataRetrievalTrigger"/> -->
 	   			</list>
 	   		</property>

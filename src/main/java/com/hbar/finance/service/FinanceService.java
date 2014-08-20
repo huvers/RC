@@ -22,6 +22,8 @@ public interface FinanceService {
 	*/
 	public void executeStocksDataRetrieval();
 
+	public void executeStocksStreamingDataRetrieval();
+		
 	public StockQuote getStockQuoteWithOrderedOptions(Long id);
 
 	public void retrieveAndPersistsOptionsInfo(String symbol);
@@ -32,7 +34,7 @@ public interface FinanceService {
 
 	public void executeBasicEquityRetrievalForCompanyFromDataSource( Company company, String equityDataSource )  throws Exception;
 	
-	public String executeBasicEquityDataAlignment(String targetSymbol, List<String> symbols, DateTime startDate, DateTime endDate, String equityDataSource, boolean isPercentagesFormat, boolean isAscending) throws Exception;
+	public String executeBasicEquityDataAlignment(String targetSymbol, List<String> symbols, DateTime startDate, DateTime endDate, String equityDataSource, boolean isPercentagesFormat, boolean isAscending, boolean includeVolume) throws Exception;
 	
 	public void executeBasicEquityDataRetrievalForStrategyFromDataSource(String strategy, String equityDataSource) throws Exception;
 

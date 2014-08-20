@@ -49,8 +49,6 @@ public class BasicStockDataDaoJpaImpl extends GenericDaoJpa<BasicStockData, Long
 		}else{
 			q=em.createNamedQuery("getBasicStockDataForCompanyBetweenDates");	
 		}
-		
-		
 		q.setParameter("companyId", id);
 		q.setParameter("startDate", startDate);
 		q.setParameter("endDate", endDate);

@@ -25,7 +25,8 @@ import com.hbar.finance.date.DateTimeHolder;
 })
 @NamedQueries({
 	@NamedQuery( name="getLatestBasicStockDateForCompany", query="SELECT bsd FROM BasicStockData bsd "+
-			"WHERE bsd.companyId=:companyId  AND bsd.versionIndex=(" +
+			"WHERE bsd.companyId=:companyId  AND bsd.versionIndex="
+			+ "(" +
 				"SELECT max(bsd2.versionIndex) FROM BasicStockData bsd2 " +
 				"WHERE bsd2.companyId=bsd.companyId AND bsd2.equityDataSourceId=bsd.equityDataSourceId" +			
 			")"+
@@ -46,10 +47,7 @@ import com.hbar.finance.date.DateTimeHolder;
 			
 	@NamedQuery(name = "getBasicStockDataForCompanyBetweenDatesAscending", query = "SELECT bsd FROM BasicStockData bsd "
 			+ "WHERE bsd.companyId=:companyId AND bsd.dateTime>=:startDate AND bsd.dateTime<=:endDate " +
-			"AND bsd.equityDataSourceId=:equityDataSourceId AND bsd.versionIndex=(" +
-				"SELECT max(bsd2.versionIndex) FROM BasicStockData bsd2 " +
-				"WHERE bsd2.companyId=bsd.companyId AND bsd2.equityDataSourceId=bsd.equityDataSourceId" +			
-			" )"+
+			"AND bsd.equityDataSourceId=:equityDataSourceId AND bsd.versionIndex=:versionIndex "+
 			" ORDER BY bsd.dateTime ASC"),
 	@NamedQuery(name = "getMaxVersionIndexForCompanyId", query = "SELECT max(bsd.versionIndex) FROM BasicStockData bsd "
 					+ "WHERE bsd.companyId=:companyId and bsd.equityDataSourceId=:equityDataSourceId")

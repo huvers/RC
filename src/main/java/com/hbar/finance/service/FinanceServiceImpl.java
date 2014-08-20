@@ -1,5 +1,10 @@
 package com.hbar.finance.service;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -157,7 +162,7 @@ public class FinanceServiceImpl implements FinanceService {
 	}
 
 	@Transactional
-	public String executeBasicEquityDataAlignment(String targetSymbol, List<String> symbols, DateTime startDate, DateTime endDate, String equityDataSource, boolean percentagesFormat, boolean isAscending) throws Exception{
+	public String executeBasicEquityDataAlignment(String targetSymbol, List<String> symbols, DateTime startDate, DateTime endDate, String equityDataSource, boolean percentagesFormat, boolean isAscending, boolean includeVolume) throws Exception{
 		Company company=companyDao.findBySymbol(targetSymbol);
 		
 		List<BasicStockData> bsdList=null;
@@ -187,10 +192,10 @@ public class FinanceServiceImpl implements FinanceService {
 			
 			associatedDataList.add(assocTargetAndSignalCompanyDateData);
 		}
-		return createDateAlignedEquityDataString(associatedDataList, isAscending).toString();	
+		return createDateAlignedEquityDataString(associatedDataList, isAscending, includeVolume).toString();	
 	}
 	
-	private StringBuffer createDateAlignedEquityDataString(List<AssociatedTargetAndSignalCompanyDateData> associatedDataList, boolean isAscending){
+	private StringBuffer createDateAlignedEquityDataString(List<AssociatedTargetAndSignalCompanyDateData> associatedDataList, boolean isAscending, boolean includeVolume){
 		StringBuffer sbDateAlignedEquityData=new StringBuffer();
 		boolean isFirstIteration=true;
 		for(int i=0;i<associatedDataList.size();i++){
@@ -202,17 +207,21 @@ public class FinanceServiceImpl implements FinanceService {
 				
 				sbDateAlignedEquityData.append(curAssocData.getTargetCompany().getSymbol()+" High,");
 				sbDateAlignedEquityData.append(curAssocData.getTargetCompany().getSymbol()+" Low,");
-				sbDateAlignedEquityData.append(curAssocData.getTargetCompany().getSymbol()+" Volume,");
+				if(includeVolume){
+					sbDateAlignedEquityData.append(curAssocData.getTargetCompany().getSymbol()+" Volume,");
+				}
 				
 				isFirstIteration=false;
 			}
 			sbDateAlignedEquityData.append(curAssocData.getSignalCompany().getSymbol()+" Close,");
 			sbDateAlignedEquityData.append(curAssocData.getSignalCompany().getSymbol()+" Open,");
 			sbDateAlignedEquityData.append(curAssocData.getSignalCompany().getSymbol()+" High,");
-			sbDateAlignedEquityData.append(curAssocData.getSignalCompany().getSymbol()+" Low,");
-			
-			sbDateAlignedEquityData.append(curAssocData.getSignalCompany().getSymbol()+" Volume"+((i==associatedDataList.size()-1)?"\n":","));
-			
+			if(includeVolume){
+				sbDateAlignedEquityData.append(curAssocData.getSignalCompany().getSymbol()+" Low,");
+				sbDateAlignedEquityData.append(curAssocData.getSignalCompany().getSymbol()+" Volume"+((i==associatedDataList.size()-1)?"\n":","));
+			}else{
+				sbDateAlignedEquityData.append(curAssocData.getSignalCompany().getSymbol()+" Low"+((i==associatedDataList.size()-1)?"\n":","));				
+			}
 		}
 		
 		AssociatedTargetAndSignalCompanyDateData firstAssocData=associatedDataList.get(0);
@@ -223,16 +232,16 @@ public class FinanceServiceImpl implements FinanceService {
 			BasicStockData targetBasicStockData=(BasicStockData)curFirstTargetAndSignalDateHolder.getTargetDateHolder();
 			
 			sbDateAlignedEquityData.append(DateUtils.createBasicStandardDateString(targetBasicStockData.getDateTime())+",");
-			writeBasicEquityDataToStringBuffer(sbDateAlignedEquityData, targetBasicStockData, false);
+			writeBasicEquityDataToStringBuffer(sbDateAlignedEquityData, targetBasicStockData, false,includeVolume);
 			
 			for(int j=0;j<associatedDataList.size();j++){
-				TargetAndSignalDateHolder curTargetAndSignalDateHolder=associatedDataList.get(j).getTargetAndSignalDateHolder().get(i);
+				TargetAndSignalDateHolder curTargetAndSignalDateHolder=associatedDataList.get(j).getTargetAndSignalDateHolder().get(isAscending ? firstTargetAndSignalDateHolderList.size()-1-i :i);
 				BasicStockData curSignalBasicStockData=(BasicStockData)curTargetAndSignalDateHolder.getSignalDateHolder();
 				//write line
 				if(j==associatedDataList.size()-1){
-					writeBasicEquityDataToStringBuffer(sbDateAlignedEquityData, curSignalBasicStockData,true);
+					writeBasicEquityDataToStringBuffer(sbDateAlignedEquityData, curSignalBasicStockData,true, includeVolume);
 				}else{
-					writeBasicEquityDataToStringBuffer(sbDateAlignedEquityData, curSignalBasicStockData, false);
+					writeBasicEquityDataToStringBuffer(sbDateAlignedEquityData, curSignalBasicStockData, false, includeVolume);
 				}
 			}
 		}
@@ -240,22 +249,69 @@ public class FinanceServiceImpl implements FinanceService {
 		return sbDateAlignedEquityData;
 	}
 	
-	private void writeBasicEquityDataToStringBuffer(StringBuffer sb, BasicStockData bsd, boolean isLastBsd){
+	private void writeBasicEquityDataToStringBuffer(StringBuffer sb, BasicStockData bsd, boolean isLastBsd, boolean includeVolume){
 		if(bsd!=null){
 
 			
 			sb.append(bsd.getClose()+",");
 			sb.append(bsd.getOpen()+",");
 			sb.append(bsd.getHigh()+",");
-			sb.append(bsd.getLow()+",");
-			sb.append(bsd.getVolume()+((isLastBsd)?"\n":","));
+			
+			if(includeVolume){
+				sb.append(bsd.getLow()+",");
+				sb.append(bsd.getVolume()+((isLastBsd)?"\n":","));
+			}else{
+				sb.append(bsd.getLow()+((isLastBsd)?"\n":","));
+			}
 		}else{
-			sb.append(",,,,"+((isLastBsd)?"\n":","));
+			if(includeVolume){
+				sb.append(",,,,"+((isLastBsd)?"\n":","));
+			}else{
+				sb.append(",,,"+((isLastBsd)?"\n":","));				
+			}
 			
 		}
 		
 		
 	}
-	
+	@Override
+	public void executeStocksStreamingDataRetrieval(){
+		TradeKingClient client=new TradeKingClient();
+		List<String> urls=new ArrayList<String>();
+		urls.add("KING");
+		urls.add("COH");
+		
+		InputStream is=client.getStreamingQuotesForSymbols(urls);
+		
+		File file = new File("C:/tomcat-6.0.36/logs/TRADE_KING_STREAM.log");
+		
+		int n;
+		
+		FileWriter fw;
+		BufferedWriter bw=null;
+		try {
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+			fw = new FileWriter(file.getAbsoluteFile());
+			bw = new BufferedWriter(fw);	
+			
+			while((n=is.read())!=-1){
+				char ch=(char)n;
+				bw.write(ch);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			try {
+				if(bw!=null){
+					bw.close();
+				}
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+		
+	}
 	
 }

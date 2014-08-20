@@ -76,33 +76,37 @@ public class BasicStockDataServiceImpl implements BasicStockDataService {
 		List<BasicStockData> basicStockData=getBasicStockDataForCompanyBetweenDates( id, startDate, endDate, isAscending, equityDataSourceId);
 		return getPercentageChangeList(basicStockData);
 	} 
-	
+	/**
+	 * Assumes that the data is in descending order
+	 * @param basicStockData
+	 * @return
+	 */
 	private List<BasicStockData> getPercentageChangeList(List<BasicStockData> basicStockData){
 		List<BasicStockData> percentagesBasicStockData=new ArrayList<BasicStockData>();
- 		BasicStockData priorBasicStockData=null;
+ 		BasicStockData latestBasicStockData=null;
  		for(int i=0;i<basicStockData.size();i++){
  			if(i==0){
- 				priorBasicStockData=basicStockData.get(i);
+ 				latestBasicStockData=basicStockData.get(i);
  				continue;
  			}
  			BasicStockData curBasicStockData=basicStockData.get(i);
  			BasicStockData curPerBasicStockData=new BasicStockData();
  			curPerBasicStockData.setCompanyId(curBasicStockData.getCompanyId());
- 			curPerBasicStockData.setDate(curBasicStockData.getDateTime());
+ 			curPerBasicStockData.setDate(latestBasicStockData.getDateTime());
  			
- 			curPerBasicStockData.setClose(BigDecimal.ONE.subtract(priorBasicStockData.getClose().divide(curBasicStockData.getClose(), 8, RoundingMode.HALF_EVEN)));
- 			curPerBasicStockData.setHigh(BigDecimal.ONE.subtract(priorBasicStockData.getHigh().divide(curBasicStockData.getHigh(), 8, RoundingMode.HALF_EVEN)));
- 			curPerBasicStockData.setLow(BigDecimal.ONE.subtract(priorBasicStockData.getLow().divide(curBasicStockData.getLow(), 8, RoundingMode.HALF_EVEN)));
+ 			curPerBasicStockData.setClose(latestBasicStockData.getClose().divide(curBasicStockData.getClose(), 8, RoundingMode.HALF_EVEN).subtract(BigDecimal.ONE));
+ 			curPerBasicStockData.setHigh(latestBasicStockData.getHigh().divide(curBasicStockData.getHigh(), 8, RoundingMode.HALF_EVEN).subtract(BigDecimal.ONE));
+ 			curPerBasicStockData.setLow(latestBasicStockData.getLow().divide(curBasicStockData.getLow(), 8, RoundingMode.HALF_EVEN).subtract(BigDecimal.ONE));
  			if(!curBasicStockData.getVolume().equals(BigDecimal.ZERO)){
- 				curPerBasicStockData.setVolume(BigDecimal.ONE.subtract(priorBasicStockData.getVolume().divide(curBasicStockData.getVolume(), 8, RoundingMode.HALF_EVEN)));
+ 				curPerBasicStockData.setVolume(latestBasicStockData.getVolume().divide(curBasicStockData.getVolume(), 8, RoundingMode.HALF_EVEN).subtract(BigDecimal.ONE));
  			}else{
  				curPerBasicStockData.setVolume(null);
  			}
- 			curPerBasicStockData.setOpen(BigDecimal.ONE.subtract(priorBasicStockData.getOpen().divide(curBasicStockData.getOpen(), 8, RoundingMode.HALF_EVEN)));
+ 			curPerBasicStockData.setOpen(latestBasicStockData.getOpen().divide(curBasicStockData.getOpen(), 8, RoundingMode.HALF_EVEN).subtract(BigDecimal.ONE));
  			
  			
  			percentagesBasicStockData.add(curPerBasicStockData);
- 			priorBasicStockData=curBasicStockData;
+ 			latestBasicStockData=curBasicStockData;
  			
  		}
 		return percentagesBasicStockData;
