@@ -9,7 +9,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.scribe.builder.*;
@@ -26,6 +28,7 @@ import org.xml.sax.SAXException;
 
 import com.hbar.finance.model.OptionQuote;
 import com.hbar.finance.model.StockQuote;
+import com.hbar.finance.streaming.StreamingWellFormedXmlInputStream;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.basic.DateConverter;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -55,23 +58,7 @@ public class TradeKingClient
 	public void setOauthTokenSecret(String oauthTokenSecret){
 		this.oauthTokenSecret=oauthTokenSecret;
 	}
-	
-	private static void stocksTest(){
 
-		List<StockQuote> quotes=new TradeKingClient().getStockQuotesForSymbol("AIG");	
-		if (quotes != null) {
-			for (int i = 0; i < quotes.size(); i++) {
-				System.out.println("q" + i + ".week52lo="
-						+ quotes.get(i).getWk52Lo());
-				System.out.println("q" + i + ".week52lodate="
-						+ quotes.get(i).getWk52LoDate());
-				System.out.println("q" + i + ".yield="
-						+ quotes.get(i).getYield());
-			}
-
-		}		
-
-	}
 	public List<StockQuote> getStockQuotesForSymbol(String symbol){
 		OAuthService service = new ServiceBuilder()
 				.provider(TradeKingApi.class).apiKey(consumerKey)
@@ -132,49 +119,62 @@ public class TradeKingClient
 		
 	}
 
-	public InputStream getStreamingQuotesForSymbols(List<String> urls) {
+	public void getStreamingQuotesForSymbols(List<String> urls) {
+		do {
+			OAuthService service = new ServiceBuilder()
+			.provider(TradeKingApi.class).apiKey(consumerKey)
+			.apiSecret(consumerSecret).build(); Token accessToken = new
+			Token(oauthToken, oauthTokenSecret);
+			 
 
-		OAuthService service = new ServiceBuilder()
-		.provider(TradeKingApi.class).apiKey(consumerKey)
-		.apiSecret(consumerSecret).build();
-		Token accessToken = new Token(oauthToken, oauthTokenSecret);
-
-		
-		StringBuffer sbSymbols=new StringBuffer();
-		for(int i=0;i<urls.size();i++){
-			if(i==urls.size()-1){
-				sbSymbols.append(urls.get(i));
-			}else{
-				sbSymbols.append(urls.get(i)+",");
+			StringBuffer sbSymbols = new StringBuffer();
+			for (int i = 0; i < urls.size(); i++) {
+				if (i == urls.size() - 1) {
+					sbSymbols.append(urls.get(i));
+				} else {
+					sbSymbols.append(urls.get(i) + ",");
+				}
 			}
-		}
-		System.out.println("symbols="+sbSymbols.toString());
-		String STREAM_URL = "https://stream.tradeking.com/v1/market/quotes.xml?symbols="
-				+ sbSymbols.toString();
-		
-		// Now let's go and ask for a protected resource!
-		OAuthRequest request = new OAuthRequest(Verb.GET, STREAM_URL);
-		service.signRequest(accessToken, request);
-		try {
-			Response response = request.send();
-			return response.getStream();
-			/*logger.info(optionsResponse);
-			System.out.println(optionsResponse);
-			XStream xStream = new XStream(new DomDriver());
-			xStream.alias("quote", OptionQuote.class);
-			xStream.alias("response", OptionsResponse.class);
-			xStream.registerConverter(new TradeKingDateConverter());
-			xStream.registerConverter(new TradeKingIntegerConverter());
-			xStream.createObjectInputStream(response.getStream());
-			OptionsResponse or1 = (OptionsResponse) xStream
-					.fromXML(optionsResponse);
-			return or1.getQuotes();*/
-		} catch (Exception exception) {
-			System.out.println("Error for STREAM_URL=" + STREAM_URL);
-			exception.printStackTrace();
-		}
-		return null;
+			System.out.println("symbols=" + sbSymbols.toString());
+			String STREAM_URL = "https://stream.tradeking.com/v1/market/quotes.xml?symbols="
+					+ sbSymbols.toString();
 
+			// Now let's go and ask for a protected resource!
+			OAuthRequest request = new OAuthRequest(Verb.GET, STREAM_URL);
+			service.signRequest(accessToken, request);
+			try {
+				Response response = request.send();
+
+				XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+				// xmlReader.setFeature("http://xml.org/sax/features/validation",
+				// false);
+				// xmlReader.setFeature("http://apache.org/xml/features/continue-after-fatal-error",
+				// true);
+				StreamingQuotesHandler sqHandler = new StreamingQuotesHandler();
+
+				xmlReader.setContentHandler(sqHandler);
+				xmlReader.setErrorHandler(sqHandler);
+				xmlReader.parse(new InputSource(
+						new StreamingWellFormedXmlInputStream(response
+								.getStream())));
+
+				/*
+				 * logger.info(optionsResponse);
+				 * System.out.println(optionsResponse); XStream xStream = new
+				 * XStream(new DomDriver()); xStream.alias("quote",
+				 * OptionQuote.class); xStream.alias("response",
+				 * OptionsResponse.class); xStream.registerConverter(new
+				 * TradeKingDateConverter()); xStream.registerConverter(new
+				 * TradeKingIntegerConverter());
+				 * xStream.createObjectInputStream(response.getStream());
+				 * OptionsResponse or1 = (OptionsResponse) xStream
+				 * .fromXML(optionsResponse); return or1.getQuotes();
+				 */
+			} catch (Exception exception) {
+				System.out.println("Error for STREAM_URL=" + STREAM_URL);
+				exception.printStackTrace();
+			}
+		} while (true);
 	}
 	
 	
@@ -212,33 +212,16 @@ public class TradeKingClient
 	}
 	public static void main(String[] args)
 	{
-		File file = new File("E:/TRADE_KING_STREAM2.xml");
+/*		File file = new File("E:/TRADE_KING_STREAM2.xml");
 		FileInputStream fis;
 		try {
 			fis = new FileInputStream(file);
 			XMLReader xmlReader = XMLReaderFactory.createXMLReader();
-			//xmlReader.setFeature("http://xml.org/sax/features/validation", false);
-			xmlReader.setFeature("http://apache.org/xml/features/continue-after-fatal-error", true);
 			StreamingQuotesHandler sqHandler=new StreamingQuotesHandler();
 			
 			xmlReader.setContentHandler(sqHandler);
 			xmlReader.setErrorHandler(sqHandler);
-			xmlReader.parse(new InputSource(fis));
-			
-			
-			
-		/*	XStream xStream = new XStream(new DomDriver());
-			xStream.alias("status", String.class);
-			xStream.alias("quote", OptionQuote.class);
-			xStream.alias("response", OptionsResponse.class);
-			xStream.registerConverter(new TradeKingDateConverter());
-			xStream.registerConverter(new TradeKingIntegerConverter());
-			ObjectInputStream ois=xStream.createObjectInputStream(fis);
-			Object object=null;
-			while((object=ois.readObject())!=null){
-				System.out.println("class="+object.getClass());
-				
-			}*/
+			xmlReader.parse(new InputSource(new StreamingWellFormedXmlInputStream(fis)));		
 		} catch ( IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -246,15 +229,14 @@ public class TradeKingClient
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
-/*		TradeKingClient client=new TradeKingClient();
+	*/	
+		TradeKingClient client=new TradeKingClient();
 		List<String> urls=new ArrayList<String>();
 		urls.add("KING");
 		urls.add("COH");
 		
-		InputStream is=client.getStreamingQuotesForSymbols(urls);
-		
+		client.getStreamingQuotesForSymbols(urls);
+		/*
 		File file = new File("C:/tomcat-6.0.36/logs/TRADE_KING_STREAM.log");
 		
 		int n;
@@ -292,10 +274,34 @@ public class TradeKingClient
 }
 
 
-class StreamingQuotesHandler extends DefaultHandler implements LexicalHandler{
+class StreamingQuotesHandler extends DefaultHandler{
 	String currentEntity=null;
+	StringBuffer sbCurElement=new StringBuffer();	
+	boolean bCollectingData=false;
+	Set<String> knownElements=new HashSet<>();
+
+	private BufferedWriter logWriter=null;
+	
+	public StreamingQuotesHandler(){
+		super();
+		knownElements.add("trade");
+		knownElements.add("quote");
+		File file = new File("C:/tomcat-6.0.36/logs/TRADE_KING_STREAM"+System.currentTimeMillis()+".log");
+		
+		FileWriter fw;		
+		try {
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+			fw = new FileWriter(file.getAbsoluteFile());
+			logWriter = new BufferedWriter(fw);	
+
+		}catch(IOException exc){
+			exc.printStackTrace();
+		}
+	}
+	
 	public void startDocument(){
-		System.out.println("startDocument");
 		try {
 			super.startDocument();
 		} catch (SAXException e) {
@@ -304,18 +310,7 @@ class StreamingQuotesHandler extends DefaultHandler implements LexicalHandler{
 		}
 	}
 	
-	public void fatalError(SAXParseException e){
-		System.out.println("fatal error");
-		try {
-			super.fatalError(e);
-		} catch (SAXException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-	}
-	
 	public void endDocument() {
-		System.out.println("endDocument");
 		try {
 			super.endDocument();
 		} catch (SAXException e) {
@@ -325,12 +320,23 @@ class StreamingQuotesHandler extends DefaultHandler implements LexicalHandler{
 	}
 	public void characters(char[] ch, int start, int length){
 		String content=new String (ch, start, length);
-		System.out.println(content);
-		if(currentEntity!=null){
+		if(bCollectingData){
+			sbCurElement.append(content);
 		}
+		
 	}
 	public void startElement(String uri, String name, String qName, Attributes attrs){
-		System.out.println("startElement");
+		if(knownElements.contains(name)){
+			sbCurElement.append("<" + name);
+			for (int i = 0; i < attrs.getLength(); i++) {
+				sbCurElement.append(" " + attrs.getLocalName(i) + "=\""
+						+ attrs.getValue(i) + "\"");
+			}
+			sbCurElement.append(">");
+			bCollectingData = true;
+		}else if(bCollectingData){
+			sbCurElement.append("<"+name+">");
+		}
 		try {
 			super.startElement(uri, name, qName, attrs);
 		} catch (SAXException e) {
@@ -340,7 +346,21 @@ class StreamingQuotesHandler extends DefaultHandler implements LexicalHandler{
 	}
 	
 	public void endElement(String uri, String name, String qName){
-		System.out.println("endElement");
+		if(knownElements.contains(name)){
+			sbCurElement.append("</"+name+">");
+			bCollectingData=false;
+			System.out.println("element="+sbCurElement.toString());
+			try {
+				logWriter.write(sbCurElement.toString()+"\n");
+				logWriter.flush();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			sbCurElement=new StringBuffer();
+		}else if(bCollectingData){
+			sbCurElement.append("<"+name+">");
+		}
+
 		try {
 			super.endElement(uri, name, qName);
 		} catch (SAXException e) {
@@ -349,46 +369,4 @@ class StreamingQuotesHandler extends DefaultHandler implements LexicalHandler{
 		}
 	}
 
-	@Override
-	public void comment(char[] arg0, int arg1, int arg2) throws SAXException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void endCDATA() throws SAXException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void endDTD() throws SAXException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void endEntity(String arg0) throws SAXException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void startCDATA() throws SAXException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void startDTD(String arg0, String arg1, String arg2)
-			throws SAXException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void startEntity(String arg0) throws SAXException {
-		// TODO Auto-generated method stub
-		
-	}
 }

@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.runner.RunWith;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -38,8 +37,7 @@ import com.hbar.finance.service.FinanceService;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations={"classpath:/applicationContext.xml"})
 @Transactional
-@Ignore
-public class DataDump {
+public class DataDumpTest {
 	@Autowired
 	OptionQuoteDao optionQuoteDao;
 
@@ -60,22 +58,20 @@ public class DataDump {
 		
 		try {
 			
-			StockQuote stockQuote=financeService.getStockQuoteWithOrderedOptions(4989l);
+			StockQuote stockQuote=financeService.getStockQuoteWithOrderedOptions(8728l);
 			List<OptionQuote> optionQuotes=stockQuote.getOptionQuotes();
 			List<BigDecimal> listBdPrices=new ArrayList<BigDecimal>();
-			listBdPrices.add(new BigDecimal(80));
-			listBdPrices.add(new BigDecimal(81));
-			listBdPrices.add(new BigDecimal(82));
-			listBdPrices.add(new BigDecimal(83));
-			listBdPrices.add(new BigDecimal(84));
-			listBdPrices.add(new BigDecimal(85));
-			listBdPrices.add(new BigDecimal(86));
-			listBdPrices.add(new BigDecimal(87));
-			listBdPrices.add(new BigDecimal(88));
-			listBdPrices.add(new BigDecimal(89));
 			listBdPrices.add(new BigDecimal(90));
-			listBdPrices.add(new BigDecimal(91));
-			StringBuffer sbColumns=new StringBuffer("ID,Name,Option Type,Option Desc,Option Ask,Strike Price,Stock Price,S/E,W/E,Created Stock Price,Premium");
+			listBdPrices.add(new BigDecimal(92));
+			listBdPrices.add(new BigDecimal(93));
+			listBdPrices.add(new BigDecimal(94));
+			listBdPrices.add(new BigDecimal(95));
+			listBdPrices.add(new BigDecimal(96));
+			listBdPrices.add(new BigDecimal(97));
+			listBdPrices.add(new BigDecimal(98));
+			listBdPrices.add(new BigDecimal(99));
+			listBdPrices.add(new BigDecimal(100));
+			StringBuffer sbColumns=new StringBuffer("ID,Name,Option Type,Option Desc,Option Ask,Option Bid,Impl Vol,Strike Price,Stock Price,S/E,W/E,Created Stock Price,Premium");
 			for(int i=0;i<listBdPrices.size();i++){
 				sbColumns.append(",% Gain / Profit / Cost at "+listBdPrices.get(i).toPlainString());
 			}
@@ -83,7 +79,7 @@ public class DataDump {
 			Date date=stockQuote.getDateTimeCreated();
 			DateFormat df = new SimpleDateFormat("MM-dd-yyyy");
 			String formattedDate = df.format(date); 
-			PrintWriter pw=new PrintWriter(new File("C:/Users/Admin/Google Drive/OptionsData/"+stockQuote.getSymbol()+"_sqId_"+stockQuote.getId()+"_"+formattedDate+".csv"));
+			PrintWriter pw=new PrintWriter(new File("C:/Users/geemein80/Desktop/"+stockQuote.getSymbol()+"_sqId_"+stockQuote.getId()+"_"+formattedDate+".csv"));
 			pw.println(sbColumns.toString());
 			
 			Map<String, List<double[]>> monthToXYCoords=new HashMap<String,List<double[]>>();
@@ -111,7 +107,8 @@ public class DataDump {
 				BigDecimal bdCreatedStockPrice=curOptionQuote.getAsk().add(curOptionQuote.getStrikeprice());
 				BigDecimal bdPremiumPrice=bdCreatedStockPrice.subtract(askOrLastStockPrice);
 				StringBuffer sbColumnValues=new StringBuffer(curOptionQuote.getId()+","+ stockQuote.getName()+","+curOptionQuote.getPutCall()
-				+","+curOptionQuote.getIssueDesc()+","+curOptionQuote.getAsk().toPlainString()+","+curOptionQuote.getStrikeprice().toPlainString()+","+askOrLastStockPrice
+				+","+curOptionQuote.getIssueDesc()+","+curOptionQuote.getAsk().toPlainString()+","+curOptionQuote.getBid().toPlainString()+","+curOptionQuote.getImpVolatility().toPlainString()+","+curOptionQuote.getStrikeprice().toPlainString()+","+askOrLastStockPrice
+				
 				+","+bdSE.toPlainString()+","+bdWE.toPlainString()+","+bdCreatedStockPrice.toPlainString()+","+bdPremiumPrice.toPlainString());
 				
 				List<double[]> curXYCoords=monthToXYCoords.get(curOptionQuote.getXmonth().toString());
@@ -168,7 +165,7 @@ public class DataDump {
 			pw.flush();
 			pw.close();
 			
-			Set<String> setMonths=monthToXYCoords.keySet();
+			/*			Set<String> setMonths=monthToXYCoords.keySet();
 			for(String curMonth:setMonths){
 				System.out.println("month="+curMonth);
 			}
@@ -181,7 +178,7 @@ public class DataDump {
 			}
 			//Plot.displayChart("S/E vs W/E", "S/E vs W/E", "xAxis", "yAxis", .7, 2, -.5, 1, months[0], monthToXYCoords.get(months[0]), months[1],  monthToXYCoords.get(months[1]));
 						
-/*			List<double[]> expectedSeries = new ArrayList<double[]>();
+			List<double[]> expectedSeries = new ArrayList<double[]>();
 			expectedSeries.add(new double[]{1.0, 0.679});
 			expectedSeries.add(new double[]{2.0, 0.963});
 			expectedSeries.add(new double[]{3.0, 0.760});

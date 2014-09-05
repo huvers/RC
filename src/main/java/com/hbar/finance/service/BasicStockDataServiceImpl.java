@@ -67,8 +67,17 @@ public class BasicStockDataServiceImpl implements BasicStockDataService {
 	}
 
 	public List<BasicStockData> getPercentageBasicStockDataForCompanyBeforeDate(Long id, DateTime date, Integer limit, boolean isAscending, String equityDataSource){
-		List<BasicStockData> basicStockData=getBasicStockDataForCompanyBeforeDate( id, date, limit, isAscending, equityDataSource);
-		return getPercentageChangeList(basicStockData);
+		List<BasicStockData> basicStockData=getBasicStockDataForCompanyBeforeDate( id, date, limit, false, equityDataSource);
+		List<BasicStockData> percBasicStockData=getPercentageChangeList(basicStockData);
+		if(isAscending){
+			List<BasicStockData> ascPercBasicStockData=new ArrayList<BasicStockData>();
+			for(BasicStockData bsd : percBasicStockData){
+				ascPercBasicStockData.add(bsd);
+			}
+			return ascPercBasicStockData;
+		}else{
+			return percBasicStockData;
+		}
 	}
 
 

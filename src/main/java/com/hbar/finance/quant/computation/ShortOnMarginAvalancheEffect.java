@@ -1,6 +1,6 @@
 package com.hbar.finance.quant.computation;
 /**
- * This class is used to computations for the Avalanche effect described in "Beat the Market by Edward Thorp". 
+ * This class is used for computations of the Avalanche effect described in "Beat the Market by Edward Thorp". 
  * @author Gerardo.Alvarado
  *
  */

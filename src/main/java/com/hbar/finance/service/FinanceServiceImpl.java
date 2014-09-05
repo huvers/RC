@@ -164,7 +164,9 @@ public class FinanceServiceImpl implements FinanceService {
 	@Transactional
 	public String executeBasicEquityDataAlignment(String targetSymbol, List<String> symbols, DateTime startDate, DateTime endDate, String equityDataSource, boolean percentagesFormat, boolean isAscending, boolean includeVolume) throws Exception{
 		Company company=companyDao.findBySymbol(targetSymbol);
-		
+		/**
+		 * NOTE: ALL LOGIC BELOW ASSUMES THAT DATES ARE IN DESCENDING ORDER - THE isAscending FLAG IS APPLIED AT THE END OF THE MAIN LOGIC
+		 */
 		List<BasicStockData> bsdList=null;
 		if(percentagesFormat){
 			bsdList=basicStockDataService.getPercentageBasicStockDataForCompanyBetweenDates(company.getId(), startDate, endDate, false, equityDataSource);	
@@ -280,7 +282,7 @@ public class FinanceServiceImpl implements FinanceService {
 		List<String> urls=new ArrayList<String>();
 		urls.add("KING");
 		urls.add("COH");
-		
+		/*
 		InputStream is=client.getStreamingQuotesForSymbols(urls);
 		
 		File file = new File("C:/tomcat-6.0.36/logs/TRADE_KING_STREAM.log");
@@ -310,7 +312,7 @@ public class FinanceServiceImpl implements FinanceService {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-		}
+		}*/
 		
 	}
 	
