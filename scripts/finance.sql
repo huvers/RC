@@ -121,6 +121,16 @@ CREATE TABLE `equity_data_source` (
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+
+
+LOCK TABLES `equity_data_source` WRITE;
+/*!40000 ALTER TABLE `equity_data_source` DISABLE KEYS */;
+INSERT INTO `equity_data_source` VALUES (1,'Yahoo!','yahoo.com',1,'2014-03-09 02:10:43','2014-03-09 03:11:43','Y'),(2,'Commodity Systems Inc.','csidata.com',1,'2014-03-09 02:12:32','2014-03-09 03:11:51','Y'),(3,'Stooq','stooq.com',1,'2014-09-06 07:13:02','2014-09-06 07:13:02','Y');
+/*!40000 ALTER TABLE `equity_data_source` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+
 --
 -- Table structure for table `option_quote`
 --
@@ -326,5 +336,12 @@ CREATE TABLE `strategy` (
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+
+LOCK TABLES `strategy` WRITE;
+/*!40000 ALTER TABLE `strategy` DISABLE KEYS */;
+INSERT INTO `strategy` VALUES (1,'Bollinger Classifier',NULL,1,'2014-07-03 04:48:54','2014-07-03 04:48:54'),(2,'Reservoir',NULL,1,'2014-07-25 07:11:21','2014-07-25 07:11:21');
+/*!40000 ALTER TABLE `strategy` ENABLE KEYS */;
+UNLOCK TABLES;
 
 -- Dump completed on 2014-07-27 15:04:30
