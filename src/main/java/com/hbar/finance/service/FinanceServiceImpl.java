@@ -33,6 +33,7 @@ public class FinanceServiceImpl implements FinanceService {
 	private StockQuoteDao stockQuoteDao;
 	private CompanyDao companyDao;
 	private StrategyDao strategyDao;
+	private StocksService stocksService;
 	private OptionsService optionsService;
 	private BollingerBandsService bollingerBandsService;
 	private TradeKingClient tradeKingClient;
@@ -77,6 +78,10 @@ public class FinanceServiceImpl implements FinanceService {
 		this.bollingerBandsService=bollingerBandsService;
 	}
 	
+	public void setStocksService(StocksService stocksService){
+		this.stocksService=stocksService;
+	}
+	
 	@Transactional
 	public void saveOptionQuoteInfo(OptionQuote optionQuote) {
 		optionQuoteDao.persist(optionQuote);
@@ -117,14 +122,21 @@ public class FinanceServiceImpl implements FinanceService {
 
 	}
 	
-	@Transactional
 	public void executeStocksDataRetrieval(){
 		List<Company> companies=companyAndStrategyAnalysisDao.getCompaniesForStrategyId(StrategyEnum.BOLLINGER_CLASSIFIER.getStrategyId());
-		for(Company curCompany:companies){
-			retrieveAndPersistsStocksInfo(curCompany.getSymbol());
+		
+		for (int i=0;i<companies.size();i++){
+			try {
+				Company curCompany=companies.get(i);
+				stocksService.retrieveAndPersistsStocksInfo(curCompany
+						.getSymbol());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 		
 	}
+	
 	@Transactional
 	public StockQuote getStockQuoteWithOrderedOptions(Long id){
 		return stockQuoteDao.getStockQuoteWithOrderedOptions(id);

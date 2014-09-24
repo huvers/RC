@@ -42,7 +42,7 @@ public class TradeKingClient
 	private static final Logger logger=Logger.getLogger(TradeKingClient.class);
 	//private static final String PROTECTED_RESOURCE_URL = "https://api.tradeking.com/v1/member/profile.xml";
 	private static final String PROTECTED_RESOURCE_URL = "https://api.tradeking.com/v1/market/options/search.xml?symbol=HPQ&query=xyear-gte:2013";
-	
+	String STOCKS_URL = "https://api.tradeking.com/v1/market/ext/quotes.xml?symbols=";
 	public void setConsumerKey(String consumerKey){
 		this.consumerKey=consumerKey;
 	}
@@ -64,9 +64,9 @@ public class TradeKingClient
 				.provider(TradeKingApi.class).apiKey(consumerKey)
 				.apiSecret(consumerSecret).build();
 		Token accessToken = new Token(oauthToken, oauthTokenSecret);
-		String OPTIONS_URL = "https://api.tradeking.com/v1/market/ext/quotes.xml?symbols="+symbol;
+		String stockSymbolUrl = STOCKS_URL+symbol;
 		// Now let's go and ask for a protected resource!
-		OAuthRequest request = new OAuthRequest(Verb.GET, OPTIONS_URL);
+		OAuthRequest request = new OAuthRequest(Verb.GET, stockSymbolUrl);
 		service.signRequest(accessToken, request);
 		try{
 			Response response = request.send();
@@ -83,7 +83,7 @@ public class TradeKingClient
 			StocksResponse or1 = (StocksResponse) xStream.fromXML(strResponse);
 			return or1.getQuotes();
 		}catch(Exception exception){
-			System.out.println("Error for OPTIONS_URL="+OPTIONS_URL);
+			System.out.println("Error for STOCKS_URL="+stockSymbolUrl);
 			exception.printStackTrace();
 		}
 		return new ArrayList<StockQuote>();

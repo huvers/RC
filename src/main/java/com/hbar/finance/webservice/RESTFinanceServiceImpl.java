@@ -54,8 +54,7 @@ public class RESTFinanceServiceImpl implements RESTFinanceService {
 	}
     
 	@GET
-	@Path("")
-	/*@Consumes(MediaType.APPLICATION_JSON)*/
+	@Path("/dateAlignedBasicEquityData")
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response dateAlignedBasicEquityData(
 			@QueryParam(SIGNAL_TICKER_IDS) String signalTickerIds,

@@ -27,10 +27,11 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 	@AttributeOverride(name="dateTimeUpdated",column=@Column(name="last_update")),
 })
 @NamedQueries({
-	@NamedQuery( name="stockQuoteWithOrderedOptions", query="SELECT sq FROM StockQuote sq " +
-			"INNER JOIN FETCH sq.optionQuotes oq " +
-			"WHERE sq.id=:stockQuoteId ORDER BY oq.xyear asc, oq.xmonth asc, oq.xday asc, oq.strikeprice")
-})
+		@NamedQuery(name = "stockQuoteWithOrderedOptions", query = "SELECT sq FROM StockQuote sq "
+				+ "INNER JOIN FETCH sq.optionQuotes oq "
+				+ "WHERE sq.id=:stockQuoteId ORDER BY oq.xyear asc, oq.xmonth asc, oq.xday asc, oq.strikeprice"),
+		@NamedQuery(name = "stockQuoteForSymbolAndDate", query = "SELECT sq FROM StockQuote sq "
+				+ "WHERE sq.symbol=:symbol AND sq.date=:date") })
 @Entity(name="StockQuote")
 @Table(name="stock_quote")
 public class StockQuote extends IdentityModel{

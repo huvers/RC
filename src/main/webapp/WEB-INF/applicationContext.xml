@@ -33,6 +33,12 @@
 			<property name="optionQuoteDao" ref="optionQuoteDao"/>
 			<property name="tradeKingClient" ref="tradeKingClient"/>
 		</bean>
+	
+		<bean id="stocksService" class="com.hbar.finance.service.StocksServiceImpl">
+			<property name="optionsService" ref="optionsService"/>
+			<property name="tradeKingClient" ref="tradeKingClient"/>
+			<property name="stockQuoteDao" ref="stockQuoteDao"/>
+		</bean>
 		
 		<bean id="CSI" class="com.hbar.finance.datasource.EquityDataSource"
 			factory-method="valueOf">
@@ -48,7 +54,16 @@
 			</constructor-arg>
 		</bean>
 		
+		<bean id="STOOQ" class="com.hbar.finance.datasource.EquityDataSource"
+			factory-method="valueOf">
+			<constructor-arg>
+				<value>STOOQ</value>
+			</constructor-arg>
+		</bean>
+		
 		<bean id="yahooBasicStockDataDownloader" class="com.hbar.finance.datasource.YahooBasicStockDataDownloader"></bean>
+		
+		<bean id="stooqBasicTickerDataDownloader" class="com.hbar.finance.datasource.StooqBasicTickerDataDownloader"></bean>
 		
 		<bean id="csiBasicStockDataDownloader" class="com.hbar.finance.datasource.CsiBasicStockDataDownloader">
 			<property name="fileLocation" value="${csi.fileLocation}"/>
@@ -62,6 +77,7 @@
 		        <map>
 		            <entry key-ref="YAHOO"><ref bean="yahooBasicStockDataDownloader"/></entry>
 		            <entry key-ref="CSI"><ref bean="csiBasicStockDataDownloader"/></entry>
+		            <entry key-ref="STOOQ"><ref bean="stooqBasicTickerDataDownloader"/></entry>
 		        </map>   
 		    </property>
 		</bean>
@@ -80,6 +96,7 @@
 	   		<property name="basicStockDataService" ref="basicStockDataService"/>
 	   		<property name="bollingerBandsService" ref="bollingerBandsService"/>
 	   		<property name="tradeKingClient" ref="tradeKingClient"/>
+	   		<property name="stocksService" ref="stocksService"/>
 	   </bean>	   
 	   
 	   <bean id="tradeKingClient" class="com.hbar.finance.providers.tradeking.TradeKingClient">

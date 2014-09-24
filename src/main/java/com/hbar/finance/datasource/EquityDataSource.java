@@ -2,7 +2,7 @@ package com.hbar.finance.datasource;
 
 public enum EquityDataSource {
 	
-	YAHOO(1), CSI(2);
+	YAHOO(1), CSI(2), STOOQ(3);
 	
 	int equityDataSourceId;
 	
