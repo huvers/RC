@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.joda.time.DateTime;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,7 +43,13 @@ public class FinanceServiceImpl implements FinanceService {
 	private CompanyAndStrategyAnalysisDao companyAndStrategyAnalysisDao;
 	
 	private BasicStockDataService basicStockDataService;
-
+	private static final String CLOSE_FIELD="close";
+	private static final String OPEN_FIELD="open";
+	private static final String VOLUME_FIELD="volume";
+	private static final String HIGH_FIELD="high";
+	private static final String LOW_FIELD="low";
+	private static final Integer NUMBER_OF_FIELDS=5;
+	
 	public void setTradeKingClient(TradeKingClient tradeKingClient){
 		this.tradeKingClient = tradeKingClient;
 	}
@@ -174,7 +182,7 @@ public class FinanceServiceImpl implements FinanceService {
 	}
 
 	@Transactional
-	public String executeBasicEquityDataAlignment(String targetSymbol, List<String> symbols, DateTime startDate, DateTime endDate, String equityDataSource, boolean percentagesFormat, boolean isAscending, boolean includeVolume) throws Exception{
+	public String executeBasicEquityDataAlignment(String targetSymbol, List<String> symbols, DateTime startDate, DateTime endDate, String equityDataSource, boolean percentagesFormat, boolean isAscending,  String excludedFields) throws Exception{
 		Company company=companyDao.findBySymbol(targetSymbol);
 		/**
 		 * NOTE: ALL LOGIC BELOW ASSUMES THAT DATES ARE IN DESCENDING ORDER - THE isAscending FLAG IS APPLIED AT THE END OF THE MAIN LOGIC
@@ -206,36 +214,60 @@ public class FinanceServiceImpl implements FinanceService {
 			
 			associatedDataList.add(assocTargetAndSignalCompanyDateData);
 		}
-		return createDateAlignedEquityDataString(associatedDataList, isAscending, includeVolume).toString();	
+		return createDateAlignedEquityDataString(associatedDataList, isAscending, excludedFields).toString();	
 	}
 	
-	private StringBuffer createDateAlignedEquityDataString(List<AssociatedTargetAndSignalCompanyDateData> associatedDataList, boolean isAscending, boolean includeVolume){
+	private StringBuffer createDateAlignedEquityDataString(List<AssociatedTargetAndSignalCompanyDateData> associatedDataList, boolean isAscending,  String excludedFields){
+		
+		Set<String> excludedFieldsSet=new TreeSet<String>();
+		if(excludedFields!=null){
+			String[] excludedFieldsArr=excludedFields.split(",");
+			for(String excludedField:excludedFieldsArr){
+				excludedFieldsSet.add(excludedField.trim().toLowerCase());
+			}
+		}
+		
 		StringBuffer sbDateAlignedEquityData=new StringBuffer();
 		boolean isFirstIteration=true;
 		for(int i=0;i<associatedDataList.size();i++){
 			AssociatedTargetAndSignalCompanyDateData curAssocData=associatedDataList.get(i);
 			if(isFirstIteration){
-				sbDateAlignedEquityData.append("Date,");
-				sbDateAlignedEquityData.append(curAssocData.getTargetCompany().getSymbol()+" Close,");
-				sbDateAlignedEquityData.append(curAssocData.getTargetCompany().getSymbol()+" Open,");
-				
-				sbDateAlignedEquityData.append(curAssocData.getTargetCompany().getSymbol()+" High,");
-				sbDateAlignedEquityData.append(curAssocData.getTargetCompany().getSymbol()+" Low,");
-				if(includeVolume){
-					sbDateAlignedEquityData.append(curAssocData.getTargetCompany().getSymbol()+" Volume,");
+				sbDateAlignedEquityData.append("Date");
+				if(!excludedFieldsSet.contains(CLOSE_FIELD)){
+					sbDateAlignedEquityData.append(","+curAssocData.getTargetCompany().getSymbol()+" Close");
+				}
+				if(!excludedFieldsSet.contains(OPEN_FIELD)){
+					sbDateAlignedEquityData.append(","+curAssocData.getTargetCompany().getSymbol()+" Open");
+				}
+				if(!excludedFieldsSet.contains(HIGH_FIELD)){
+					sbDateAlignedEquityData.append(","+curAssocData.getTargetCompany().getSymbol()+" High");
+				}
+				if(!excludedFieldsSet.contains(LOW_FIELD)){
+					sbDateAlignedEquityData.append(","+curAssocData.getTargetCompany().getSymbol()+" Low");
+				}
+				if(!excludedFieldsSet.contains(VOLUME_FIELD)){
+					sbDateAlignedEquityData.append(","+curAssocData.getTargetCompany().getSymbol()+" Volume");
 				}
 				
 				isFirstIteration=false;
 			}
-			sbDateAlignedEquityData.append(curAssocData.getSignalCompany().getSymbol()+" Close,");
-			sbDateAlignedEquityData.append(curAssocData.getSignalCompany().getSymbol()+" Open,");
-			sbDateAlignedEquityData.append(curAssocData.getSignalCompany().getSymbol()+" High,");
-			if(includeVolume){
-				sbDateAlignedEquityData.append(curAssocData.getSignalCompany().getSymbol()+" Low,");
-				sbDateAlignedEquityData.append(curAssocData.getSignalCompany().getSymbol()+" Volume"+((i==associatedDataList.size()-1)?"\n":","));
-			}else{
-				sbDateAlignedEquityData.append(curAssocData.getSignalCompany().getSymbol()+" Low"+((i==associatedDataList.size()-1)?"\n":","));				
+			if(!excludedFieldsSet.contains(CLOSE_FIELD)){
+				sbDateAlignedEquityData.append(","+curAssocData.getSignalCompany().getSymbol()+" Close");
 			}
+			if(!excludedFieldsSet.contains(OPEN_FIELD)){
+				sbDateAlignedEquityData.append(","+curAssocData.getSignalCompany().getSymbol()+" Open");
+			}
+			if(!excludedFieldsSet.contains(HIGH_FIELD)){
+				sbDateAlignedEquityData.append(","+curAssocData.getSignalCompany().getSymbol()+" High");
+			}
+			if(!excludedFieldsSet.contains(LOW_FIELD)){
+				sbDateAlignedEquityData.append(","+curAssocData.getSignalCompany().getSymbol()+" Low");
+			}
+			if(!excludedFieldsSet.contains(VOLUME_FIELD)){
+				sbDateAlignedEquityData.append(","+curAssocData.getSignalCompany().getSymbol()+" Volume");
+			}
+			sbDateAlignedEquityData.append((i==associatedDataList.size()-1)?"\n":"");
+			
 		}
 		
 		AssociatedTargetAndSignalCompanyDateData firstAssocData=associatedDataList.get(0);
@@ -245,17 +277,17 @@ public class FinanceServiceImpl implements FinanceService {
 			TargetAndSignalDateHolder curFirstTargetAndSignalDateHolder=firstTargetAndSignalDateHolderList.get(isAscending ? firstTargetAndSignalDateHolderList.size()-1-i :i);
 			BasicStockData targetBasicStockData=(BasicStockData)curFirstTargetAndSignalDateHolder.getTargetDateHolder();
 			
-			sbDateAlignedEquityData.append(DateUtils.createBasicStandardDateString(targetBasicStockData.getDateTime())+",");
-			writeBasicEquityDataToStringBuffer(sbDateAlignedEquityData, targetBasicStockData, false,includeVolume);
+			sbDateAlignedEquityData.append(DateUtils.createBasicStandardDateString(targetBasicStockData.getDateTime()));
+			writeBasicEquityDataToStringBuffer(sbDateAlignedEquityData, targetBasicStockData, false, excludedFieldsSet);
 			
 			for(int j=0;j<associatedDataList.size();j++){
 				TargetAndSignalDateHolder curTargetAndSignalDateHolder=associatedDataList.get(j).getTargetAndSignalDateHolder().get(isAscending ? firstTargetAndSignalDateHolderList.size()-1-i :i);
 				BasicStockData curSignalBasicStockData=(BasicStockData)curTargetAndSignalDateHolder.getSignalDateHolder();
 				//write line
 				if(j==associatedDataList.size()-1){
-					writeBasicEquityDataToStringBuffer(sbDateAlignedEquityData, curSignalBasicStockData,true, includeVolume);
+					writeBasicEquityDataToStringBuffer(sbDateAlignedEquityData, curSignalBasicStockData,true, excludedFieldsSet);
 				}else{
-					writeBasicEquityDataToStringBuffer(sbDateAlignedEquityData, curSignalBasicStockData, false, includeVolume);
+					writeBasicEquityDataToStringBuffer(sbDateAlignedEquityData, curSignalBasicStockData, false, excludedFieldsSet);
 				}
 			}
 		}
@@ -263,27 +295,36 @@ public class FinanceServiceImpl implements FinanceService {
 		return sbDateAlignedEquityData;
 	}
 	
-	private void writeBasicEquityDataToStringBuffer(StringBuffer sb, BasicStockData bsd, boolean isLastBsd, boolean includeVolume){
+	private void writeBasicEquityDataToStringBuffer(StringBuffer sb, BasicStockData bsd, boolean isLastBsd, Set<String> excludedFieldsSet ){
 		if(bsd!=null){
+			if(!excludedFieldsSet.contains(CLOSE_FIELD)){
+				sb.append(","+bsd.getClose());
+			}
 
-			
-			sb.append(bsd.getClose()+",");
-			sb.append(bsd.getOpen()+",");
-			sb.append(bsd.getHigh()+",");
-			
-			if(includeVolume){
-				sb.append(bsd.getLow()+",");
-				sb.append(bsd.getVolume()+((isLastBsd)?"\n":","));
-			}else{
-				sb.append(bsd.getLow()+((isLastBsd)?"\n":","));
+			if(!excludedFieldsSet.contains(OPEN_FIELD)){
+				sb.append(","+bsd.getOpen());
 			}
+
+			if(!excludedFieldsSet.contains(HIGH_FIELD)){
+				sb.append(","+bsd.getHigh());
+			}
+
+			if(!excludedFieldsSet.contains(LOW_FIELD)){
+				sb.append(","+bsd.getLow());
+			}
+
+			if(!excludedFieldsSet.contains(VOLUME_FIELD)){
+				sb.append(","+bsd.getVolume());
+			}
+
+			sb.append((isLastBsd)?"\n":"");
+			
 		}else{
-			if(includeVolume){
-				sb.append(",,,,"+((isLastBsd)?"\n":","));
-			}else{
-				sb.append(",,,"+((isLastBsd)?"\n":","));				
+			int numExcludedFields=excludedFieldsSet.size();
+			for(int i=0;i<NUMBER_OF_FIELDS-numExcludedFields;i++){
+				sb.append(",");
 			}
-			
+			sb.append((isLastBsd)?"\n":"");
 		}
 		
 		

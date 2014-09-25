@@ -37,7 +37,7 @@ public class RESTFinanceServiceImpl implements RESTFinanceService {
 	private static final String IS_ASCENDING = "isAscending";
 	private static final String TRAIN_DAYS = "trainDays";
 	private static final String TRIAL_DAYS = "trialDays";
-	private static final String INCLUDE_VOLUME = "includeVolume";
+	private static final String EXCLUDED_FIELDS = "excludedFields";
 	
 	
 	private static final boolean DEFAULT_IS_PERCENTAGES_FORMAT=false;
@@ -64,7 +64,7 @@ public class RESTFinanceServiceImpl implements RESTFinanceService {
 			@QueryParam(EQUITY_DATA_SOURCE_ID) String equityDataSourceId,
 			@QueryParam(IS_PERCENTAGES_FORMAT) Boolean isPercentagesFormat,
 			@QueryParam(IS_ASCENDING) Boolean isAscending,
-			@QueryParam(INCLUDE_VOLUME) Boolean includeVolume
+			@QueryParam(EXCLUDED_FIELDS) String excludedFields
 			) throws Exception{
 		DateTime startDateTime=DateUtils.createDateTimeFromString(startDate);
 		DateTime endDateTime=DateUtils.createDateTimeFromString(endDate);
@@ -74,8 +74,7 @@ public class RESTFinanceServiceImpl implements RESTFinanceService {
 				isPercentagesFormat == null ? DEFAULT_IS_PERCENTAGES_FORMAT
 						: isPercentagesFormat,
 				isAscending == null ? DEFAULT_IS_ASCENDING : isAscending,
-				includeVolume == null ? DEFAULT_INCLUDE_VOLUME
-							: includeVolume
+				excludedFields
 				);
 		return Response.ok().header("Content-Disposition", "attachment; filename=\"test_text_file.csv\"").entity(result).build();
 	}

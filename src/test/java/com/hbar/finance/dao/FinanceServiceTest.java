@@ -675,7 +675,7 @@ public class FinanceServiceTest {
 		symbols.add("^N225");
 		DateTime startDateTime=new DateTime(2006, 1, 1, 0,0);
 		DateTime endDateTime=new DateTime(2014, 1, 1, 0,0);
-		financeService.executeBasicEquityDataAlignment("^GSPC", symbols, startDateTime, endDateTime, "YAHOO", true,true,true);
+		financeService.executeBasicEquityDataAlignment("^GSPC", symbols, startDateTime, endDateTime, "YAHOO", true,true,"volume");
 	}
 }
 
